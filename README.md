@@ -52,7 +52,7 @@ Just pure, unadulterated power at your fingertips.
 **This tool is too powerful to be free.**
 Join the elite. Stop using script-kiddie tools.
 
-[![BUY ON GUMROAD](https://img.shields.io/badge/BUY%20ON-GUMROAD-ff0050?style=for-the-badge&logo=gumroad&logoColor=white)](YOUR_GUMROAD_LINK_HERE)
+[![BUY ON GUMROAD](https://img.shields.io/badge/BUY%20ON-GUMROAD-ff0050?style=for-the-badge&logo=gumroad&logoColor=white)](https://chadi0x.gumroad.com/l/Psychopath)
 
 **Instant Download Includes:**
 -   ✅ Full Source Code (Python/Flask)
