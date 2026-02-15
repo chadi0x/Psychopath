@@ -1,6 +1,14 @@
-# PSYCHOPATH <small>by Chadi0x</small>
+<h1 align="center">🧠 PSYCHOPATH 🧠</h1>
 
-![Psychopath Banner](static/psychopath_banner.png)
+<p align="center">
+  <b>Understand the mind. Map the behavior. Predict the outcome.</b>
+</p>
+
+<p align="center">
+  <sub>by Chadi0x</sub>
+</p>
+
+![Psychopath Banner](https://github.com/user-attachments/assets/db059917-4197-49e4-80e6-552034b187a2)
 
 > **The Dashboard That Scares Security Analysts.**
 > *Stop playing games. Start controlling the narrative.*
