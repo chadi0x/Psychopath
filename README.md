@@ -14,6 +14,8 @@
 > *Stop playing games. Start controlling the narrative.*
 
 ## 💀 What is Psychopath?
+<img width="1675" height="825" alt="Screenshot 2026-02-15 at 16 46 50" src="https://github.com/user-attachments/assets/28bd9542-50bd-4864-a62a-5ef6b9876ccd" />
+
 **Psychopath is not a tool. It's a weapon.**
 Designed for elite Red Teamers who demand absolute control, this dashboard integrates every attack vector into a single, cinema-grade interface.
 **No more terminal windows. No more clunky scripts.**
