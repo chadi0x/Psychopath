@@ -46,7 +46,7 @@ Just pure, unadulterated power at your fingertips.
 **See Everything.**
 -   **IP Grabber & Geo-Tracking:** Pinpoint targets on a global map.
 -   **ISP & Device Fingerprinting:** Know their OS, Browser, and Provider before they even click.
--   **People Archive:** Dox your targets and map their connections visually.
+-   **People Archive:** ### your targets and map their connections visually.
 
 ---
 
