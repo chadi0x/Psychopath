@@ -49,12 +49,26 @@ Just pure, unadulterated power at your fingertips.
 -   **People Archive:** ### your targets and map their connections visually.
 
 ---
+## 🎥 Project Demo
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=_XnwJJQ5ZaA" target="_blank">
+    <img src="https://img.youtube.com/vi/_XnwJJQ5ZaA/maxresdefault.jpg" 
+         alt="Watch the demo video" 
+         width="800">
+  </a>
+</p>
+
+<p align="center">
+  🔥 Click the image above to watch the full demo on YouTube
+</p>
+
 
 ## � GET IT NOW
 **This tool is too powerful to be free.**
 Join the elite. Stop using script-kiddie tools.
 
-[![BUY ON GUMROAD](https://img.shields.io/badge/BUY%20ON-GUMROAD-ff0050?style=for-the-badge&logo=gumroad&logoColor=white)](https://ko-fi.com/s/a41fa4588d)
+[![Fuel The Project](https://img.shields.io/badge/Fuel%20The-Project-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/s/a41fa4588d)
 
 **Instant Download Includes:**
 -   ✅ Full Source Code (Python/Flask)
