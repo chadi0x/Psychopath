@@ -1,5 +1,7 @@
-# 🧠 PSYCHOPATH CONSOLE
-
+<p align="center">
+<img width="1376" height="768" alt="psychopath" src="https://github.com/user-attachments/assets/41afeb9c-a6dc-4a52-9780-36797ab114ac" />
+  
+</p>
 <p align="center">
   <img src="https://img.shields.io/badge/Psychopath_Console-v2.5.0-red?style=for-the-badge&logo=shield" alt="Version">
   <img src="https://img.shields.io/badge/Author-chadi0x-000000?style=for-the-badge&logo=github&logoColor=white" alt="Author">
@@ -30,11 +32,11 @@
 
 | 🖥️ Main Dashboard & Target Dossiers | 🕸️ Elite Connections Relational Graph |
 | :---: | :---: |
-| ![Dashboard Screenshot](docs/screenshots/dashboard.png) <br> *Target Dossier Management & Live Vault* | ![Connections Screenshot](docs/screenshots/connections.png) <br> *Dynamic Vis.js Relational Mind Map* |
+| <img width="1358" height="637" alt="dashboard" src="https://github.com/user-attachments/assets/a72fa69e-98f0-4c0e-8427-714169bb779f" /> <br> *Target Dossier Management & Live Vault* | <img width="1347" height="623" alt="linnks" src="https://github.com/user-attachments/assets/0bee25ff-79ca-4a95-bb36-e04b477e61f7" /> <br> *Dynamic Vis.js Relational Mind Map* |
 
 | 🛰️ OSINT Intelligence & Image Recon | ⚡ Flash Phishing Multi-Platform Portal |
 | :---: | :---: |
-| ![OSINT Screenshot](docs/screenshots/osint.png) <br> *Automated Footprinting & Headless Scraper* | ![Flash Phishing Screenshot](docs/screenshots/flash_phishing.png) <br> *30+ Turnkey Cloned Portals with Tunneling* |
+| <img width="1352" height="635" alt="intelgence" src="https://github.com/user-attachments/assets/e7ddeff6-d20d-4a52-bb6f-16d88875bb1b" />  <br> *30+ Turnkey Cloned Portals with Tunneling* | 
 
 | 📦 Evil Package Factory & Lures | 🔪 SMTP Knife & Credential Vault |
 | :---: | :---: |
