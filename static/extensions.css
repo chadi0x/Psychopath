@@ -1,0 +1,249 @@
+/**
+ * ==============================================================================
+ *  PSYCHOPATH CONSOLE — EXTENSIONS / UTILITY STYLES
+ *  chadi0x (https://github.com/chadi0x) · Educational Use Only
+ * ==============================================================================
+ */
+
+/* ── Navigation Tabs ────────────────────────────────────────────────────────── */
+.main-nav {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 150ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab.active {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #f1f5f9;
+}
+
+/* ── Vis.js Mindmap Canvas ──────────────────────────────────────────────────── */
+#mindmap {
+  width: 100%;
+  height: 70vh;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ── OSINT Container ────────────────────────────────────────────────────────── */
+.osint-container {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── OSINT Results Table ────────────────────────────────────────────────────── */
+.osint-results table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.osint-results th,
+.osint-results td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.osint-results th {
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.osint-results tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dork-link {
+  color: #f1f5f9;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  transition: color 150ms ease-out;
+}
+
+.dork-link:hover {
+  color: #dc2626;
+}
+
+/* ── Connections toolbar ────────────────────────────────────────────────────── */
+.glass-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 0.25rem;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.btn-icon-small {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: #64748b;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: all 150ms ease-out;
+}
+
+.btn-icon-small:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.glass-select {
+  background: rgba(10, 15, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.82rem;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  transition: border-color 150ms;
+}
+
+.glass-select:focus {
+  border-color: rgba(220, 38, 38, 0.4);
+  outline: none;
+}
+
+/* ── Connections wrapper ────────────────────────────────────────────────────── */
+.connections-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── Flash phishing / Evil data table ──────────────────────────────────────── */
+.table-dark {
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-border-color: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+}
+
+.table thead th {
+  color: #475569 !important;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: transparent;
+}
+
+.table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+}
+
+/* ── Custom scrollbar global ────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+/* ── Flash data table status badges ─────────────────────────────────────────── */
+.status-badge-live {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #10b981;
+  padding: 2px 10px; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 600;
+}
+
+.status-badge-expired {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  color: #64748b;
+  padding: 2px 10px; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 600;
+}
+
+/* ── Product actions hover area ─────────────────────────────────────────────── */
+.product-actions { transition: opacity 150ms ease-out; }
+.group-hover:not(:hover) .product-actions { opacity: 0 !important; }
+
+/* ── Empty state ─────────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 4rem 2rem;
+  color: #475569; text-align: center; gap: 1rem;
+}
+.empty-state i { font-size: 2.5rem; opacity: 0.3; }
+.empty-state p { font-size: 0.9rem; max-width: 320px; line-height: 1.6; }
+
+/* ── Tunnel indicator pulse ─────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.pulse-live { animation: pulse-dot 2s infinite; }

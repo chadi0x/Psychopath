@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-chart-pie text-danger me-2" style="font-size:0.95rem;"></i>
+      Tracker Analytics
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      All active IP tracking tripwires and captured geolocation data
+    </p>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="osint-container">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th style="width:44px;">#</th>
+          <th>Target</th>
+          <th>Bait URL</th>
+          <th>Activity</th>
+          <th>Created</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for logger in loggers %}
+        {% set person = Person.query.get(logger.person_id) if logger.person_id else None %}
+        <tr>
+          <td><span class="row-id">#{{ logger.id }}</span></td>
+          <td>
+            {% if person %}
+            <div class="d-flex align-items-center gap-2">
+              <img src="{{ person.image_url or 'https://ui-avatars.com/api/?name=' + person.name + '&background=1a2336&color=64748b&size=64' }}"
+                   class="rounded-circle" width="28" height="28"
+                   style="border:1px solid rgba(255,255,255,0.1); object-fit:cover;">
+              <span class="fw-semibold" style="font-size:0.85rem;">{{ person.name }}</span>
+            </div>
+            {% else %}
+            <span class="unlinked-badge">Unlinked</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="bait-url">{{ logger.target_url }}</div>
+          </td>
+          <td>
+            {% set hits = logger.logs|length %}
+            {% if hits > 0 %}
+            <span class="hits-badge hits-active">
+              <i class="fa-solid fa-crosshairs"></i> {{ hits }} hit{{ 's' if hits != 1 else '' }}
+            </span>
+            {% else %}
+            <span class="hits-badge hits-waiting">
+              <span class="status-dot pulse-live" style="background:#334155;"></span>
+              Waiting
+            </span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="text-muted" style="font-size:0.78rem;">
+              {{ logger.created_at.strftime('%Y-%m-%d %H:%M') }}
+            </span>
+          </td>
+          <td class="text-end">
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="{{ logger.stats_link }}" class="tbl-action-btn" title="View Stats">
+                <i class="fa-solid fa-chart-line"></i>
+              </a>
+              <button onclick="copyLink('{{ logger.tracking_link }}')"
+                      class="tbl-action-btn" title="Copy Trap Link">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state py-5">
+              <i class="fa-solid fa-ghost"></i>
+              <p>No active trackers found. Generate one in the Intelligence module.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function copyLink(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    if (window.showToast) showToast('Trap link copied!');
+  });
+}
+</script>
+
+<style>
+.row-id { font-size:0.72rem; color:#334155; font-family:'Fira Code',monospace; }
+
+.unlinked-badge {
+  font-size:0.72rem; color:#475569;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:2px 8px; border-radius:999px;
+}
+
+.bait-url {
+  font-size:0.78rem; color:#64748b;
+  font-family:'Fira Code',monospace;
+  max-width:260px; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
+}
+
+.hits-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:0.72rem; font-weight:600;
+  padding:3px 10px; border-radius:999px;
+}
+.hits-active {
+  background:rgba(220,38,38,0.1); color:#dc2626;
+  border:1px solid rgba(220,38,38,0.25);
+}
+.hits-waiting {
+  background:rgba(255,255,255,0.04); color:#475569;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; text-decoration:none; cursor:pointer;
+  transition:all 150ms ease-out;
+  font-family:inherit;
+}
+.tbl-action-btn:hover {
+  background:rgba(255,255,255,0.09); color:#f1f5f9;
+  border-color:rgba(255,255,255,0.15);
+}
+</style>
+
+{% endblock %}

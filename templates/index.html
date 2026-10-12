@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ── Page Header ─────────────────────────────────────────────────────────── -->
+<div class="page-section-header">
+    <div>
+        <h2 class="mb-0">
+            <i class="fa-solid fa-database text-danger me-2" style="font-size:1rem;"></i>
+            Target Database
+        </h2>
+        <p class="text-muted mb-0 mt-1" style="font-size:0.8rem;">
+            {{ people|length }} profile{{ 's' if people|length != 1 else '' }} indexed
+        </p>
+    </div>
+    <form action="{{ url_for('index') }}" method="GET" class="d-flex gap-2 align-items-center">
+        <div class="search-input-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" name="q" class="form-control search-input"
+                   placeholder="Search targets…"
+                   value="{{ search_query or '' }}">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    </form>
+</div>
+
+<!-- ── Grid of Target Cards ─────────────────────────────────────────────────── -->
+{% if people %}
+<div class="targets-grid">
+    {% for person in people %}
+    <div class="target-card" onclick='openPersonModal({{ person.to_dict()|tojson }})'>
+
+        <!-- Top row: note badge + country -->
+        <div class="target-card-top">
+            {% if person.note %}
+            <span class="note-pill"><i class="fa-solid fa-note-sticky"></i></span>
+            {% else %}
+            <span></span>
+            {% endif %}
+            {% if person.country %}
+            <span class="country-pill">
+                <i class="fa-solid fa-location-dot"></i> {{ person.country }}
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Avatar -->
+        <div class="target-avatar-wrap">
+            <img src="{{ person.image_url or 'https://ui-avatars.com/api/?name=' + person.name + '&background=1a2336&color=64748b&bold=true&size=128' }}"
+                 class="target-avatar"
+                 alt="{{ person.name }}"
+                 onerror="this.src='https://ui-avatars.com/api/?name={{ person.name }}&background=1a2336&color=64748b&bold=true&size=128'">
+            {% if person.ip_address %}
+            <span class="avatar-ip-dot" title="{{ person.ip_address }}">
+                <i class="fa-solid fa-wifi" style="font-size:0.5rem;"></i>
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="target-info">
+            <h4 class="target-name">{{ person.name }}</h4>
+            <span class="target-role">{{ person.job or 'Unknown Role' }}</span>
+        </div>
+
+        <!-- Actions (revealed on hover) -->
+        <div class="target-actions" onclick="event.stopPropagation()">
+            <a href="{{ url_for('edit_person', id=person.id) }}"
+               class="action-btn" title="Edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            <form action="{{ url_for('delete_person', id=person.id) }}" method="POST"
+                  class="d-inline" onsubmit="return confirm('Permanently delete {{ person.name }}?')">
+                <button type="submit" class="action-btn danger" title="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<!-- Empty state -->
+<div class="empty-state" style="min-height: 60vh;">
+    <i class="fa-solid fa-folder-open"></i>
+    <p>No targets yet{% if search_query %} matching "<strong>{{ search_query }}</strong>"{% endif %}.</p>
+    <a href="{{ url_for('add_person') }}" class="btn btn-primary btn-sm mt-2">
+        <i class="fa-solid fa-plus me-1"></i> Add First Target
+    </a>
+</div>
+{% endif %}
+
+<!-- Footer Credit -->
+<footer class="glass-footer text-center mt-5">
+    <p class="text-muted" style="font-size:0.78rem;">
+        Developed by <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer"
+           class="dev-name text-decoration-none">chadi0x</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer"
+           class="text-muted text-decoration-none">
+            <i class="fa-brands fa-github me-1"></i>github.com/chadi0x
+        </a>
+    </p>
+</footer>
+
+<!-- ── Dossier Modal ──────────────────────────────────────────────────────────── -->
+<div id="personModal" class="modal">
+    <div class="modal-content">
+        <a class="close-modal" onclick="closeModal()">&times;</a>
+
+        <div class="modal-header">
+            <div class="modal-img-wrapper">
+                <img id="modalImg" src="" alt="Profile">
+            </div>
+            <div class="modal-title-block">
+                <h2 id="modalName">—</h2>
+                <div class="job-title" id="modalJob">Unknown Classification</div>
+                <div class="modal-badges">
+                    <span id="modalCountry" class="badge" style="display:none;">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalCountry', true)">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </span>
+                    <span id="modalIp" class="badge" style="display:none;">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalIp', true)">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-grid">
+            <!-- Left: Data & Notes -->
+            <div class="modal-left-col">
+                <div id="modalNoteContainer" class="holo-note">
+                    <p id="modalNote"></p>
+                    <button class="copy-btn-tech"
+                            onclick="copyText('modalNote')"
+                            style="position:absolute;bottom:10px;right:10px;">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+
+                <div class="section-title"><i class="fa-solid fa-cube"></i> Entity Data</div>
+
+                <div class="data-row">
+                    <span class="data-label">Email</span>
+                    <span class="data-val" id="modalEmail">
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalEmail', true)">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </span>
+                </div>
+
+                <div class="data-row" id="modalLinkRow" style="display:none;">
+                    <span class="data-label">Social Links</span>
+                    <span class="data-val" id="modalLinks">
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalLinks', true)">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right: Vault -->
+            <div class="modal-right-col">
+                <div class="section-title"><i class="fa-solid fa-lock"></i> Secure Vault</div>
+                <button class="vault-btn" onclick="toggleVault()">
+                    <i class="fa-solid fa-fingerprint"></i> Decrypt
+                </button>
+                <div id="vaultContent" class="vault-content hidden">
+                    <div class="data-row locked-content">
+                        <span class="data-label">ID</span>
+                        <span class="data-val">
+                            <span id="modalSocialEmail" class="blur-text"></span>
+                            <button class="copy-btn-tech" onclick="copyText('modalSocialEmail')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </span>
+                    </div>
+                    <div class="data-row locked-content">
+                        <span class="data-label">Key</span>
+                        <span class="data-val">
+                            <span id="modalSocialPass" class="blur-text"></span>
+                            <button class="copy-btn-tech" onclick="copyText('modalSocialPass')">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Inline grid & card styles ────────────────────────────────────────────── -->
+<style>
+/* Search input */
+.search-input-wrap { position: relative; }
+.search-icon {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: #334155; font-size: 0.75rem; pointer-events: none;
+}
+.search-input {
+  padding-left: 2rem !important;
+  width: 220px !important;
+  transition: width 200ms ease-out !important;
+}
+.search-input:focus { width: 280px !important; }
+
+/* Targets grid */
+.targets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Target card */
+.target-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 1.25rem 1rem 1rem;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 0.6rem;
+  position: relative; overflow: hidden;
+  transition: transform 150ms ease-out, border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.target-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220,38,38,0.2), transparent);
+  opacity: 0; transition: opacity 200ms;
+}
+
+.target-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+.target-card:hover::before { opacity: 1; }
+
+/* Top row */
+.target-card-top {
+  display: flex; justify-content: space-between;
+  align-items: center; width: 100%;
+  min-height: 20px;
+}
+
+.note-pill {
+  font-size: 0.65rem; color: #f59e0b;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.2);
+  padding: 2px 6px; border-radius: 999px;
+}
+
+.country-pill {
+  font-size: 0.62rem; color: #475569;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2px 7px; border-radius: 999px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* Avatar */
+.target-avatar-wrap { position: relative; }
+.target-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.1);
+  transition: border-color 150ms;
+}
+.target-card:hover .target-avatar { border-color: rgba(220,38,38,0.35); }
+
+.avatar-ip-dot {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 16px; height: 16px;
+  background: rgba(16,185,129,0.2);
+  border: 1px solid rgba(16,185,129,0.4);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #10b981;
+}
+
+/* Info */
+.target-name {
+  font-size: 0.9rem; font-weight: 700;
+  color: #f1f5f9; margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.target-role {
+  font-size: 0.7rem; font-weight: 600;
+  color: #dc2626; text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+/* Actions */
+.target-actions {
+  display: flex; gap: 0.4rem;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity 150ms, transform 150ms;
+}
+.target-card:hover .target-actions { opacity: 1; transform: translateY(0); }
+
+.action-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #64748b; width: 28px; height: 28px;
+  border-radius: 6px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  transition: all 150ms; text-decoration: none;
+}
+.action-btn:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
+.action-btn.danger:hover { background: rgba(220,38,38,0.12); color: #dc2626; border-color: rgba(220,38,38,0.3); }
+</style>
+
+{% endblock %}

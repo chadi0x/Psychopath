@@ -1,0 +1,250 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4" style="height: calc(100vh - 140px);">
+
+  <!-- ── Config Column ───────────────────────────────────────────────────── -->
+  <div class="col-md-4 h-100 overflow-auto custom-scrollbar">
+    <div class="osint-container h-100 d-flex flex-column">
+      <div class="pf-section-label mb-3">
+        <i class="fa-solid fa-envelope-open-text me-1"></i>Email Factory
+      </div>
+
+      <form id="emailGenForm" class="d-flex flex-column gap-3 flex-grow-1">
+
+        <!-- Platform -->
+        <div>
+          <label class="form-label">1. Target Platform</label>
+          <select id="platformSelect" class="form-select" onchange="updateUI()">
+            <!-- JS Injected -->
+          </select>
+        </div>
+
+        <!-- Template Variant (radio tiles) -->
+        <div>
+          <label class="form-label">2. Template Variant</label>
+          <div class="d-flex gap-2">
+            <input type="radio" class="btn-check" name="templateType" id="typeDownload" value="download" checked onchange="updateUI()">
+            <label class="os-btn" for="typeDownload"><i class="fa-solid fa-download"></i><br><span>File</span></label>
+
+            <input type="radio" class="btn-check" name="templateType" id="typeLogin" value="login" onchange="updateUI()">
+            <label class="os-btn" for="typeLogin"><i class="fa-solid fa-right-to-bracket"></i><br><span>Login</span></label>
+
+            <input type="radio" class="btn-check" name="templateType" id="typeContact" value="contact" onchange="updateUI()">
+            <label class="os-btn" for="typeContact"><i class="fa-solid fa-envelope"></i><br><span>Contact</span></label>
+          </div>
+        </div>
+
+        <!-- Dynamic inputs -->
+        <div class="p-3" style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.07); border-radius:8px;">
+          <div class="mb-3">
+            <label class="form-label">Target Name</label>
+            <input type="text" id="targetName" class="form-control" placeholder="e.g. John Doe">
+          </div>
+          <div id="downloadInputGroup">
+            <label class="form-label">Download Link</label>
+            <input type="text" id="downloadLink" class="form-control" placeholder="https://…">
+          </div>
+          <div id="loginInputGroup" class="d-none">
+            <label class="form-label">Phishing Link</label>
+            <input type="text" id="phishingLink" class="form-control" placeholder="https://…">
+          </div>
+          <div id="contactInputGroup" class="d-none">
+            <label class="form-label">Reply-To Email</label>
+            <input type="text" id="replyEmail" class="form-control" placeholder="support@…">
+          </div>
+        </div>
+
+        <!-- Anti-spam toggle -->
+        <div class="d-flex align-items-center gap-2"
+             style="font-size:0.78rem; color:#64748b;">
+          <input class="form-check-input m-0" type="checkbox" id="hardeningCheck" checked disabled>
+          <label for="hardeningCheck">Anti-Spam Obfuscation (Enforced)</label>
+          <i class="fa-solid fa-lock text-muted" style="font-size:0.65rem;"></i>
+        </div>
+
+        <!-- Generate button -->
+        <button type="button" onclick="generateEmail()" class="flash-deploy-btn">
+          <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generate Template
+        </button>
+
+        <!-- Source Code output -->
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label mb-0">HTML Source</label>
+            <button type="button" onclick="copySource()" class="tbl-action-btn" title="Copy source">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+          <textarea id="codeOutput"
+                    class="form-control"
+                    style="min-height:140px; font-family:'Fira Code',monospace; font-size:0.72rem; color:#10b981; background:#0a0f1a; resize:vertical;"
+                    readonly></textarea>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Preview Column ──────────────────────────────────────────────────── -->
+  <div class="col-md-8 h-100">
+    <div class="osint-container h-100 d-flex flex-column p-0 overflow-hidden">
+      <!-- Preview bar -->
+      <div class="d-flex justify-content-between align-items-center px-3 py-2"
+           style="border-bottom:1px solid rgba(255,255,255,0.07); background:rgba(0,0,0,0.25); flex-shrink:0;">
+        <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:#334155;">
+          <i class="fa-solid fa-eye me-1"></i>Live Preview
+        </div>
+        <span id="previewBadge" class="badge-tech">No Template Loaded</span>
+      </div>
+      <!-- iframe -->
+      <div class="flex-grow-1 bg-white position-relative">
+        <iframe id="previewFrame" class="w-100 h-100 border-0" sandbox="allow-same-origin"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const platforms = [
+    { id:'google',    name:'Google',    color:'#4285F4', logo:'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
+    { id:'microsoft', name:'Microsoft', color:'#00A4EF', logo:'https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg' },
+    { id:'apple',     name:'Apple',     color:'#000000', logo:'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+    { id:'netflix',   name:'Netflix',   color:'#E50914', logo:'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' },
+    { id:'amazon',    name:'Amazon',    color:'#FF9900', logo:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+    { id:'facebook',  name:'Facebook',  color:'#1877F2', logo:'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg' },
+    { id:'instagram', name:'Instagram', color:'#E1306C', logo:'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg' },
+    { id:'linkedin',  name:'LinkedIn',  color:'#0A66C2', logo:'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png' },
+    { id:'twitter',   name:'X (Twitter)', color:'#000000', logo:'https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg' },
+    { id:'paypal',    name:'PayPal',    color:'#003087', logo:'https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg' },
+    { id:'spotify',   name:'Spotify',   color:'#1DB954', logo:'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg' },
+    { id:'dropbox',   name:'Dropbox',   color:'#0061FF', logo:'https://upload.wikimedia.org/wikipedia/commons/7/78/Dropbox_Icon.svg' },
+    { id:'zoom',      name:'Zoom',      color:'#2D8CFF', logo:'https://upload.wikimedia.org/wikipedia/commons/2/24/Zoom_communications_logo.svg' },
+    { id:'slack',     name:'Slack',     color:'#4A154B', logo:'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
+    { id:'adobe',     name:'Adobe',     color:'#FF0000', logo:'https://upload.wikimedia.org/wikipedia/commons/8/8d/Adobe_Corporate_Logo.png' },
+    { id:'tiktok',    name:'TikTok',    color:'#000000', logo:'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg' },
+    { id:'snapchat',  name:'Snapchat',  color:'#FFFC00', logo:'https://upload.wikimedia.org/wikipedia/en/c/c4/Snapchat_logo.svg' },
+    { id:'whatsapp',  name:'WhatsApp',  color:'#25D366', logo:'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' },
+    { id:'binance',   name:'Binance',   color:'#F0B90B', logo:'https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg' },
+    { id:'coinbase',  name:'Coinbase',  color:'#0052FF', logo:'https://upload.wikimedia.org/wikipedia/commons/1/1b/Coinbase_logo.png' }
+  ];
+
+  const variants = {
+    download: { subject:"Action Required: Download Available", header:"File Ready for Download", body:"A secure file has been shared with you via {PLATFORM}. Please download it immediately as the link expires in 24 hours.", btnText:"Download File", footer:"This email was sent automatically. Please do not reply." },
+    login:    { subject:"Security Alert: New Sign-in Attempt", header:"Suspicious Activity Detected", body:"We noticed an unusual login attempt to your {PLATFORM} account from an unrecognized device. If this wasn't you, secure your account now.", btnText:"Secure My Account", footer:"Security Team • ID: #8829102" },
+    contact:  { subject:"You have a new message", header:"Support Request Update", body:"The {PLATFORM} support team has updated your ticket. A response is required to proceed.", btnText:"View Message", footer:"Customer Support Team" }
+  };
+
+  function randStr() { return Math.random().toString(36).substring(7); }
+  function obfuscate(t) { return t.split('').join('&zwnj;'); }
+  function randomComment() { return `<!-- ${randStr()} -->`; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const sel = document.getElementById('platformSelect');
+    platforms.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+    updateUI();
+  });
+
+  function updateUI() {
+    const type = document.querySelector('input[name="templateType"]:checked').value;
+    ['download','login','contact'].forEach(t => document.getElementById(t+'InputGroup').classList.toggle('d-none', t !== type));
+  }
+
+  function generateEmail() {
+    const platformId = document.getElementById('platformSelect').value;
+    const type       = document.querySelector('input[name="templateType"]:checked').value;
+    const targetName = document.getElementById('targetName').value || 'User';
+    const isHardened = document.getElementById('hardeningCheck').checked;
+    let actionLink = '#';
+    if (type === 'download') actionLink = document.getElementById('downloadLink').value || '#';
+    if (type === 'login')    actionLink = document.getElementById('phishingLink').value || '#';
+    if (type === 'contact')  { const e = document.getElementById('replyEmail').value; if(e) actionLink = `mailto:${e}`; }
+    const plat    = platforms.find(p => p.id === platformId);
+    const variant = variants[type];
+    const logoUrl = isHardened ? `${plat.logo}?v=${randStr()}` : plat.logo;
+    const bodyText = variant.body.replace('{PLATFORM}', plat.name);
+
+    const html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>${variant.subject}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+${randomComment()}</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;">
+<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f4f4;">
+<tr><td align="center" style="padding:20px 0;">
+<table border="0" cellpadding="0" cellspacing="0" width="600" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);">
+${randomComment()}
+<tr><td align="center" style="padding:30px;border-bottom:1px solid #eee;">
+<img src="${logoUrl}" alt="${plat.name}" height="40" style="display:block;border:0;outline:none;text-decoration:none;"/></td></tr>
+<tr><td style="padding:40px;color:#333;font-family:Arial,sans-serif;font-size:16px;line-height:1.6;">
+<h2 style="margin-top:0;color:#111;">${variant.header}</h2>
+<p>Hi ${targetName},</p><p>${bodyText}</p>
+${randomComment()}
+<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" style="padding:20px 0;">
+<a href="${actionLink}" style="display:inline-block;background-color:${plat.color};color:#fff;text-decoration:none;padding:14px 34px;border-radius:4px;font-weight:bold;font-size:16px;">${variant.btnText}</a>
+</td></tr></table>
+<p style="margin-top:30px;font-size:13px;color:#666;">If you didn't request this, ignore this email.</p>
+</td></tr>
+<tr><td align="center" style="padding:20px;background:#fafafa;color:#888;font-family:Arial,sans-serif;font-size:12px;">
+<p style="margin:0;">${variant.footer}</p>
+<p style="margin:5px 0 0;">&copy; ${new Date().getFullYear()} ${plat.name} Inc.</p>
+</td></tr></table></td></tr></table>
+${randomComment()}</body></html>`;
+
+    document.getElementById('codeOutput').value = html;
+    const iframe = document.getElementById('previewFrame');
+    const doc = iframe.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+    document.getElementById('previewBadge').textContent = `${plat.name} – ${type.toUpperCase()}`;
+  }
+
+  function copySource() {
+    navigator.clipboard.writeText(document.getElementById('codeOutput').value)
+      .then(() => { if(window.showToast) showToast('Source copied!'); else alert('Copied!'); });
+  }
+</script>
+
+<style>
+.os-btn {
+  flex:1; text-align:center; cursor:pointer;
+  padding:0.55rem 0.4rem;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:7px; font-size:0.75rem; color:#64748b;
+  background:rgba(255,255,255,0.03);
+  transition:all 150ms ease-out; line-height:1.4;
+}
+.btn-check:checked + .os-btn {
+  background:rgba(220,38,38,0.1); border-color:rgba(220,38,38,0.3);
+  color:#f1f5f9; font-weight:600;
+}
+.os-btn:hover { background:rgba(255,255,255,0.06); color:#f1f5f9; }
+
+.flash-deploy-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.6rem 1rem; border-radius:8px;
+  background:#dc2626; border:1px solid #dc2626;
+  color:#fff; font-weight:700; font-size:0.85rem;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.flash-deploy-btn:hover { background:#b91c1c; box-shadow:0 4px 16px rgba(220,38,38,0.25); }
+
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.09); color:#f1f5f9; }
+
+.pf-section-label {
+  font-size:0.65rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:#334155;
+}
+</style>
+
+{% endblock %}

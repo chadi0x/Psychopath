@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetCrack Pro - Ultimate WiFi Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .glitch-container {
+            padding: 100px 0;
+            border: 1px solid #0f0;
+            margin: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        .download-btn {
+            background-color: transparent;
+            color: #0f0;
+            font-weight: bold;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: 2px solid #0f0;
+            text-decoration: none;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .download-btn:hover {
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 30px #0f0;
+        }
+
+        .matrix-bg {
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px);
+        }
+    </style>
+</head>
+
+<body class="matrix-bg">
+    <div class="container py-5 text-center">
+        <div class="glitch-container">
+            <h1 class="display-2 fw-bold mb-2"><i class="fa-solid fa-wifi"></i> NetCrack_v9</h1>
+            <p class="lead mb-5">// UNLOCK_ANY_NETWORK // WPA3_BYPASS // AUTO_CONNECT</p>
+
+            <div class="mb-5">
+                <p>TARGET_SYSTEM: <span class="fw-bold bg-success text-black px-2">{{ payload.os_type|upper }}</span>
+                </p>
+                <p>STATUS: <span class="fw-bold">READY_TO_INJECT</span></p>
+            </div>
+
+            <a href="{{ download_link }}" class="download-btn">
+                [ INITIATE_DOWNLOAD ]
+            </a>
+
+            <div class="mt-4 small opacity-50">
+                MD5: A3F89...29B1 | SIZE: 14.2MB
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4 text-start border-end border-success border-opacity-25">
+                <h5>> FEATURES</h5>
+                <ul>
+                    <li>Silent Mode</li>
+                    <li>No Root/Admin Req</li>
+                    <li>Auto-Save Handshakes</li>
+                </ul>
+            </div>
+            <div class="col-md-4 text-start border-end border-success border-opacity-25">
+                <h5>> COMPATIBILITY</h5>
+                <p class="text-muted">Detected OS: {{ payload.os_type|capitalize }} (Supported)</p>
+            </div>
+            <div class="col-md-4 text-start">
+                <h5>> LOGS</h5>
+                <p class="text-muted">Waiting for user execution...</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

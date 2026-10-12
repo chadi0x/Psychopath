@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-lock-open text-danger me-2" style="font-size:0.95rem;"></i>
+      Flash Phishing Logs
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      Credentials captured from active flash campaigns
+    </p>
+  </div>
+  <a href="{{ url_for('flash_phishing') }}" class="tbl-action-btn px-3 gap-2" style="width:auto;">
+    <i class="fa-solid fa-bolt"></i>
+    <span style="font-size:0.78rem;">Campaigns</span>
+  </a>
+</div>
+
+<div class="osint-container">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th style="width:120px;">Timestamp</th>
+          <th style="width:150px;">Platform</th>
+          <th>Credentials</th>
+          <th style="width:140px;">IP Address</th>
+          <th style="width:200px;">Device</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>
+            <span class="text-muted" style="font-size:0.72rem; font-family:'Fira Code',monospace;">
+              {{ log.timestamp.strftime('%H:%M:%S %d/%m') }}
+            </span>
+          </td>
+          <td>
+            <div class="d-flex gap-1 flex-wrap">
+              <span class="platform-badge">{{ log.link.platform }}</span>
+              <span class="lang-badge">{{ log.link.language }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex flex-column gap-1">
+              <span style="font-family:'Fira Code',monospace; font-size:0.8rem; color:#94a3b8;">
+                <i class="fa-solid fa-at text-muted me-1" style="font-size:0.65rem;"></i>
+                {{ log.email }}
+              </span>
+              <span style="font-family:'Fira Code',monospace; font-size:0.8rem; color:#dc2626;">
+                <i class="fa-solid fa-key text-muted me-1" style="font-size:0.65rem;"></i>
+                {{ log.password }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span style="font-family:'Fira Code',monospace; font-size:0.78rem; color:#dc2626; font-weight:600;">
+              {{ log.ip }}
+            </span>
+          </td>
+          <td>
+            <span class="text-muted text-truncate d-block" style="font-size:0.72rem; max-width:190px;">
+              {{ log.user_agent[:55] if log.user_agent else '—' }}…
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5">
+            <div class="empty-state py-5">
+              <i class="fa-solid fa-fish-fins"></i>
+              <p>No credentials captured yet.<br>Deploy a campaign in Flash Phishing to start.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.platform-badge {
+  font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+  background:rgba(220,38,38,0.1); color:#dc2626;
+  border:1px solid rgba(220,38,38,0.2);
+  padding:2px 8px; border-radius:4px;
+}
+.lang-badge {
+  font-size:0.68rem; font-weight:600;
+  background:rgba(255,255,255,0.05); color:#64748b;
+  border:1px solid rgba(255,255,255,0.08);
+  padding:2px 8px; border-radius:4px;
+}
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.09); color:#f1f5f9; }
+</style>
+
+{% endblock %}

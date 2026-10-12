@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ── Developer Dossier ─────────────────────────────────────────────────── -->
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+
+    <!-- Identity Card -->
+    <div class="dev-identity-card">
+      <div class="dev-card-top-bar"></div>
+
+      <div class="dev-card-body">
+        <!-- Avatar -->
+        <div class="dev-avatar-wrap">
+          <div class="dev-avatar">
+            <i class="fa-brands fa-github"></i>
+          </div>
+          <span class="dev-verified-badge" title="Verified Author">
+            <i class="fa-solid fa-check"></i>
+          </span>
+        </div>
+
+        <!-- Name & role -->
+        <div class="dev-name-block">
+          <h1 class="dev-handle">chadi0x</h1>
+          <p class="dev-title">Offensive Security Researcher &amp; Core Architect</p>
+          <p class="dev-sub">Lead developer of Psychopath Console v2.5</p>
+        </div>
+
+        <!-- Stats row -->
+        <div class="dev-stats-row">
+          <div class="dev-stat">
+            <span class="dev-stat-label">Framework</span>
+            <span class="dev-stat-val">Psychopath v2.5</span>
+          </div>
+          <div class="dev-stat-divider"></div>
+          <div class="dev-stat">
+            <span class="dev-stat-label">Specialty</span>
+            <span class="dev-stat-val">OSINT &amp; Red Team</span>
+          </div>
+          <div class="dev-stat-divider"></div>
+          <div class="dev-stat">
+            <span class="dev-stat-label">GitHub</span>
+            <span class="dev-stat-val">@chadi0x</span>
+          </div>
+        </div>
+
+        <!-- CTA buttons -->
+        <div class="dev-actions">
+          <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer" class="dev-btn-primary">
+            <i class="fa-brands fa-github me-2"></i>Visit GitHub Profile
+          </a>
+          <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer" class="dev-btn-secondary">
+            <i class="fa-solid fa-star me-2 text-warning"></i>Star on GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Disclaimer Banner -->
+      <div class="dev-disclaimer">
+        <div class="dev-disclaimer-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="dev-disclaimer-body">
+          <p class="dev-disclaimer-title">Legal Disclaimer &amp; Educational Policy</p>
+          <p class="dev-disclaimer-text">
+            This software (<strong>Psychopath Console</strong>) was developed strictly for
+            <strong>educational research, authorized penetration testing, and defensive posture evaluation</strong>.
+            The author <strong>chadi0x</strong> assumes
+            <strong>NO responsibility or liability</strong> for any illicit use, damages,
+            unauthorized access, or legal infractions caused by third-party deployment or misuse of this software.
+            Deploy only within authorized, consented test environments.
+          </p>
+          <div class="dev-disclaimer-footer">
+            <span class="dev-pill-badge">Zero Liability</span>
+            <span class="dev-disclaimer-note">Use strictly within authorized boundaries with explicit legal consent.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integrity signature -->
+      <div class="dev-signature">
+        <i class="fa-solid fa-fingerprint text-danger me-1" style="font-size:0.65rem;"></i>
+        Build: <code>SHA256::CHADI0X-AUTHENTICATED</code> &nbsp;·&nbsp;
+        Author: <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer" class="text-danger fw-bold text-decoration-none">chadi0x</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.dev-identity-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  margin-top: 1rem;
+}
+
+.dev-card-top-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 5%, #dc2626 30%, #dc2626 70%, transparent 95%);
+  opacity: 0.7;
+}
+
+.dev-card-body {
+  padding: 2.5rem 2rem 2rem;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 1.5rem;
+}
+
+.dev-avatar-wrap { position: relative; }
+
+.dev-avatar {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(220,38,38,0.1);
+  border: 1px solid rgba(220,38,38,0.25);
+  display: flex; align-items: center; justify-content: center;
+  color: #dc2626; font-size: 2.5rem;
+  box-shadow: 0 0 40px rgba(220,38,38,0.1);
+}
+
+.dev-verified-badge {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 22px; height: 22px;
+  background: #dc2626; border-radius: 50%;
+  border: 2px solid #080d14;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.55rem;
+}
+
+.dev-name-block { display: flex; flex-direction: column; gap: 0.25rem; }
+
+.dev-handle {
+  font-size: 2rem; font-weight: 900;
+  color: #f1f5f9; letter-spacing: -0.04em; margin: 0;
+}
+
+.dev-title {
+  font-size: 0.8rem; font-weight: 700; color: #dc2626;
+  text-transform: uppercase; letter-spacing: 0.08em; margin: 0;
+}
+
+.dev-sub { font-size: 0.82rem; color: #475569; margin: 0; }
+
+/* Stats row */
+.dev-stats-row {
+  display: flex; align-items: center; gap: 1.5rem;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; padding: 1rem 2rem;
+  width: 100%; justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dev-stat { display: flex; flex-direction: column; gap: 0.2rem; align-items: center; }
+.dev-stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #334155; font-weight: 700; }
+.dev-stat-val { font-size: 0.82rem; color: #f1f5f9; font-weight: 600; }
+.dev-stat-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.07); }
+
+/* Buttons */
+.dev-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+
+.dev-btn-primary {
+  display: inline-flex; align-items: center;
+  background: #dc2626; color: #fff;
+  padding: 0.6rem 1.4rem; border-radius: 8px;
+  text-decoration: none; font-size: 0.85rem; font-weight: 600;
+  transition: all 150ms ease-out;
+  border: 1px solid #dc2626;
+}
+.dev-btn-primary:hover { background: #b91c1c; box-shadow: 0 6px 20px rgba(220,38,38,0.25); color: #fff; }
+
+.dev-btn-secondary {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.05); color: #f1f5f9;
+  padding: 0.6rem 1.4rem; border-radius: 8px;
+  text-decoration: none; font-size: 0.85rem; font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 150ms ease-out;
+}
+.dev-btn-secondary:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18); color: #fff; }
+
+/* Disclaimer */
+.dev-disclaimer {
+  display: flex; gap: 1.25rem; align-items: flex-start;
+  background: rgba(220,38,38,0.06);
+  border-top: 1px solid rgba(220,38,38,0.15);
+  padding: 1.5rem 2rem;
+}
+
+.dev-disclaimer-icon {
+  font-size: 1.4rem; color: #dc2626;
+  flex-shrink: 0; margin-top: 2px;
+}
+
+.dev-disclaimer-body { flex: 1; }
+.dev-disclaimer-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #dc2626; margin-bottom: 0.6rem; }
+.dev-disclaimer-text { font-size: 0.82rem; color: #94a3b8; line-height: 1.65; margin-bottom: 0.9rem; }
+
+.dev-disclaimer-footer { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+.dev-pill-badge {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  background: rgba(220,38,38,0.12); color: #dc2626;
+  border: 1px solid rgba(220,38,38,0.3); padding: 2px 10px; border-radius: 999px;
+}
+
+.dev-disclaimer-note { font-size: 0.75rem; color: #475569; font-style: italic; }
+
+/* Signature bar */
+.dev-signature {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: rgba(0,0,0,0.25);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.72rem; color: #334155;
+  gap: 0.25rem;
+}
+.dev-signature code { font-size: 0.68rem; color: #475569; }
+</style>
+{% endblock %}

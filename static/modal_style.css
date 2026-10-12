@@ -1,0 +1,271 @@
+/**
+ * ==============================================================================
+ *  PSYCHOPATH CONSOLE — MODAL & DOSSIER STYLES
+ *  chadi0x (https://github.com/chadi0x) · Educational Use Only
+ * ==============================================================================
+ */
+
+/* ── Modal Shell ────────────────────────────────────────────────────────────── */
+.modal-content {
+  background: #0d1421 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(220, 38, 38, 0.06) !important;
+  overflow: hidden;
+  position: relative;
+  max-width: 820px;
+  padding: 0;
+  /* Remove the old sci-fi clip-path */
+  clip-path: none !important;
+}
+
+/* Subtle top accent line */
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.4), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Modal Header ───────────────────────────────────────────────────────────── */
+.modal-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.75rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ── Profile Image ──────────────────────────────────────────────────────────── */
+.modal-img-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.modal-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Modal Title ────────────────────────────────────────────────────────────── */
+.modal-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-title-block h2 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #f1f5f9;
+  text-shadow: none;
+  text-transform: none;
+  margin: 0 0 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Job title under name */
+.job-title {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  color: #dc2626;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-left: 2px solid #dc2626;
+  padding-left: 8px;
+  margin: 0.25rem 0 0.75rem;
+}
+
+/* ── Badges row ─────────────────────────────────────────────────────────────── */
+.modal-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+/* ── Content Grid ───────────────────────────────────────────────────────────── */
+.modal-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+.modal-left-col {
+  padding: 1.5rem 1.75rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-right-col {
+  padding: 1.5rem 1.75rem;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* ── Section Titles ─────────────────────────────────────────────────────────── */
+.section-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #475569;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.section-title i {
+  color: #dc2626;
+  font-size: 0.7rem;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Data Rows ──────────────────────────────────────────────────────────────── */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 6px;
+  border-left: 2px solid transparent;
+  transition: background 150ms ease-out, border-color 150ms ease-out;
+}
+
+.data-row:hover {
+  background: rgba(220, 38, 38, 0.06);
+  border-left-color: #dc2626;
+}
+
+.data-label {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.data-val {
+  color: #f1f5f9;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: right;
+}
+
+/* ── Vault states ───────────────────────────────────────────────────────────── */
+.locked-content {
+  background: rgba(220, 38, 38, 0.06) !important;
+  border: 1px dashed rgba(220, 38, 38, 0.2) !important;
+  border-left: 2px solid rgba(220, 38, 38, 0.3) !important;
+}
+
+.unlocked-content {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+/* ── Copy Button (tech style) ───────────────────────────────────────────────── */
+.copy-btn-tech {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #475569;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.6rem;
+  transition: all 150ms ease-out;
+  flex-shrink: 0;
+}
+
+.copy-btn-tech:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* ── Holo Note (Status Log) ─────────────────────────────────────────────────── */
+.holo-note {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  border-left: 3px solid #f59e0b;
+  color: #fde68a;
+  padding: 1.1rem 1.25rem 1.1rem 1rem;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  position: relative;
+  border-radius: 6px;
+  margin-bottom: 1.25rem;
+}
+
+.holo-note::before {
+  content: 'STATUS LOG';
+  position: absolute;
+  top: -9px;
+  left: 12px;
+  background: #0d1421;
+  padding: 0 6px;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: rgba(245, 158, 11, 0.65);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+/* ── Close Button ───────────────────────────────────────────────────────────── */
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  color: #475569;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  z-index: 10;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 150ms ease-out;
+}
+
+.close-modal:hover {
+  color: #f1f5f9;
+  background: rgba(255,255,255,0.1);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .modal-header { flex-direction: column; align-items: center; text-align: center; }
+  .modal-grid   { grid-template-columns: 1fr; }
+  .modal-left-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .modal-title-block h2 { font-size: 1.35rem; white-space: normal; }
+}

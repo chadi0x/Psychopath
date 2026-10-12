@@ -1,0 +1,303 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-satellite-dish text-danger me-2" style="font-size:0.95rem;"></i>
+      OSINT Intelligence
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      Advanced recon · Visual intelligence · Digital tripwire
+    </p>
+  </div>
+</div>
+
+<!-- ── Dork Search ─────────────────────────────────────────────────────────── -->
+<div class="osint-container mb-4">
+  <div class="pf-section-label mb-3">Advanced Recon — Dork Search</div>
+  <div class="d-flex gap-2">
+    <input type="text" id="targetInput" class="form-control"
+           placeholder="Target: username, email, phone, domain…">
+    <button onclick="runAdvancedSearch()" class="btn btn-primary px-4" style="white-space:nowrap;">
+      <i class="fa-solid fa-magnifying-glass me-2"></i>Scan
+    </button>
+  </div>
+
+  <div id="resultsArea" style="display:none;" class="mt-4">
+    <div class="d-flex gap-2 mb-3">
+      <button class="tbl-action-btn px-2 gap-1" style="width:auto;" onclick="expandAll()">
+        <i class="fa-solid fa-expand"></i> Expand All
+      </button>
+      <button class="tbl-action-btn px-2 gap-1" style="width:auto;" onclick="collapseAll()">
+        <i class="fa-solid fa-compress"></i> Collapse
+      </button>
+    </div>
+    <div id="dorkCategories"></div>
+  </div>
+</div>
+
+<!-- ── Two-col row ─────────────────────────────────────────────────────────── -->
+<div class="row g-4">
+  <!-- Visual Intel -->
+  <div class="col-md-6">
+    <div class="osint-container h-100">
+      <div class="pf-section-label mb-3">
+        <i class="fa-solid fa-camera me-1"></i>Target Visuals
+      </div>
+      <p class="text-muted mb-3" style="font-size:0.78rem;">
+        Find images related to the target via headless Selenium scraping.
+      </p>
+
+      <div class="d-flex flex-column gap-2 mb-3">
+        <select id="visualTargetId" class="form-select">
+          <option value="">— Link results to target —</option>
+          {% for p in people %}
+          <option value="{{ p.id }}">{{ p.name }}</option>
+          {% endfor %}
+        </select>
+        <div class="d-flex gap-2">
+          <input type="text" id="imgTargetInput" class="form-control" placeholder="Name or alias…">
+          <button onclick="scrapeImages()" class="btn btn-primary px-4" style="white-space:nowrap;">
+            <i class="fa-solid fa-robot me-1"></i>Fetch
+          </button>
+        </div>
+      </div>
+
+      <div id="imgResults" class="row g-2">
+        <div class="empty-state py-4">
+          <i class="fa-solid fa-image"></i>
+          <p>No visuals captured yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Digital Tripwire -->
+  <div class="col-md-6">
+    <div class="osint-container h-100">
+      <div class="pf-section-label mb-3">
+        <i class="fa-solid fa-link me-1"></i>Digital Tripwire
+      </div>
+      <p class="text-muted mb-3" style="font-size:0.78rem;">
+        Generate a covert tracking link to capture IP, device, and geolocation.
+      </p>
+
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <label class="form-label">Bait URL</label>
+          <input type="text" id="baitUrl" class="form-control"
+                 value="https://drive.google.com/file/d/confidential.pdf">
+        </div>
+        <div>
+          <label class="form-label">Link to Target <span class="text-muted fw-normal">(Optional)</span></label>
+          <select id="linkTargetId" class="form-select">
+            <option value="">— No Association —</option>
+            {% for p in people %}
+            <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button onclick="generateLogger()" class="flash-deploy-btn">
+          <i class="fa-solid fa-crosshairs me-2"></i>Generate Tracker
+        </button>
+      </div>
+
+      <div id="loggerResult" class="mt-4 d-none">
+        <div class="data-row mb-2" style="background:rgba(220,38,38,0.06); border-left:3px solid #dc2626;">
+          <span class="data-label"><i class="fa-solid fa-biohazard me-1 text-danger"></i>Trap Link</span>
+          <a href="#" id="trackLink" target="_blank"
+             class="data-val text-danger text-decoration-none" style="word-break:break-all;">…</a>
+        </div>
+        <div class="data-row" style="background:rgba(16,185,129,0.06); border-left:3px solid #10b981;">
+          <span class="data-label"><i class="fa-solid fa-chart-line me-1 text-success"></i>Stats View</span>
+          <a href="#" id="statsLink" target="_blank"
+             class="data-val text-success text-decoration-none">View Logs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function runAdvancedSearch() {
+    const target = document.getElementById('targetInput').value;
+    if (!target) return;
+    fetch('/osint/advanced_search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target })
+    }).then(r => r.json()).then(data => renderResults(data.dorks));
+  }
+
+  function renderResults(dorks) {
+    const container = document.getElementById('dorkCategories');
+    container.innerHTML = '';
+    document.getElementById('resultsArea').style.display = 'block';
+    for (const [category, items] of Object.entries(dorks)) {
+      const section = document.createElement('div');
+      section.className = 'osint-category';
+      const header = document.createElement('div');
+      header.className = 'category-header';
+      header.innerHTML = `<span>${category}</span><span class="count-badge">${items.length}</span>`;
+      header.onclick = () => section.classList.toggle('collapsed');
+      const content = document.createElement('div');
+      content.className = 'category-content';
+      items.forEach(item => {
+        const link = document.createElement('a');
+        link.href = item.url; link.target = '_blank';
+        link.className = 'dork-chip';
+        link.innerHTML = `<i class="fa-brands fa-google" style="font-size:0.65rem;"></i> ${item.query}`;
+        content.appendChild(link);
+      });
+      section.appendChild(header); section.appendChild(content);
+      container.appendChild(section);
+    }
+  }
+
+  function expandAll() { document.querySelectorAll('.osint-category').forEach(el => el.classList.remove('collapsed')); }
+  function collapseAll() { document.querySelectorAll('.osint-category').forEach(el => el.classList.add('collapsed')); }
+
+  function scrapeImages() {
+    const target = document.getElementById('imgTargetInput').value;
+    if (!target) return;
+    const container = document.getElementById('imgResults');
+    container.innerHTML = '<div class="text-center py-4"><i class="fa-solid fa-circle-notch fa-spin fa-2x text-danger"></i><p class="text-muted mt-2" style="font-size:0.78rem;">Deploying headless browser…</p></div>';
+    fetch('/osint/images', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target })
+    }).then(r => r.json()).then(data => {
+      container.innerHTML = '';
+      if (data.images?.length) {
+        data.images.forEach(img => {
+          const col = document.createElement('div');
+          col.className = 'col-4';
+          col.innerHTML = `
+            <div class="ratio ratio-1x1 rounded overflow-hidden position-relative img-hover-group"
+                 style="border:1px solid rgba(255,255,255,0.08);">
+              <img src="${img.url}" class="object-fit-cover w-100 h-100" loading="lazy">
+              <div class="img-overlay">
+                <a href="${img.url}" target="_blank" class="tbl-action-btn" title="View">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                <button onclick="linkImage('${img.url}')" class="tbl-action-btn" title="Link to target">
+                  <i class="fa-solid fa-link"></i>
+                </button>
+              </div>
+            </div>`;
+          container.appendChild(col);
+        });
+      } else {
+        container.innerHTML = '<div class="text-center text-muted py-4" style="font-size:0.8rem;">No images found or blocked.</div>';
+      }
+    });
+  }
+
+  function linkImage(url) {
+    const personId = document.getElementById('visualTargetId').value;
+    if (!personId) { alert('Select a target first.'); return; }
+    if (!confirm('Set as profile picture?')) return;
+    fetch('/osint/images/save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ person_id: personId, url })
+    }).then(r => r.json()).then(d => {
+      if (d.status === 'success') { if(window.showToast) showToast('Image linked!'); else alert('Linked!'); }
+      else alert('Error: ' + d.message);
+    });
+  }
+
+  function generateLogger() {
+    const target   = document.getElementById('baitUrl').value;
+    const personId = document.getElementById('linkTargetId').value;
+    document.getElementById('loggerResult').classList.add('d-none');
+    fetch('/osint/iplogger', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_url: target, person_id: personId })
+    }).then(r => r.json()).then(data => {
+      if (data.status === 'error') { alert(data.message); return; }
+      document.getElementById('trackLink').href = data.tracking_link;
+      document.getElementById('trackLink').innerText = data.tracking_link;
+      document.getElementById('statsLink').href = data.stats_link;
+      document.getElementById('loggerResult').classList.remove('d-none');
+    });
+  }
+</script>
+
+<style>
+/* Dork categories */
+.osint-category {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+.category-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.2);
+  cursor: pointer; font-weight: 600;
+  font-size: 0.82rem; color: #94a3b8;
+  transition: background 150ms;
+}
+.category-header:hover { background: rgba(0,0,0,0.35); color: #f1f5f9; }
+.count-badge {
+  font-size: 0.65rem; background: rgba(220,38,38,0.15); color: #dc2626;
+  border: 1px solid rgba(220,38,38,0.25); padding: 2px 8px; border-radius: 999px;
+}
+.category-content {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem; padding: 0.75rem 1rem;
+}
+.osint-category.collapsed .category-content { display: none; }
+
+.dork-chip {
+  display: block; background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: #64748b; padding: 0.55rem 0.75rem;
+  border-radius: 6px; text-decoration: none; font-size: 0.75rem;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  transition: all 150ms ease-out;
+}
+.dork-chip:hover { border-color: rgba(220,38,38,0.3); color: #f1f5f9; background: rgba(220,38,38,0.06); }
+
+/* Image overlay */
+.img-hover-group .img-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 0.4rem;
+  padding: 0.4rem; background: rgba(0,0,0,0.7);
+  opacity: 0; transition: opacity 150ms;
+}
+.img-hover-group:hover .img-overlay { opacity: 1; }
+
+/* Shared */
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:6px; color:#94a3b8;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.1); color:#f1f5f9; }
+
+.flash-deploy-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.6rem 1rem; border-radius:8px;
+  background:#dc2626; border:1px solid #dc2626;
+  color:#fff; font-weight:700; font-size:0.85rem;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.flash-deploy-btn:hover { background:#b91c1c; box-shadow:0 4px 16px rgba(220,38,38,0.25); }
+
+.pf-section-label {
+  font-size:0.65rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:#334155;
+}
+</style>
+
+{% endblock %}

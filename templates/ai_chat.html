@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-0" style="height: calc(100vh - 130px);">
+
+  <!-- ── Session Sidebar ────────────────────────────────────────────────── -->
+  <div class="col-md-3 d-flex flex-column h-100"
+       style="background:#0c1220; border-right:1px solid rgba(255,255,255,0.07); border-radius:12px 0 0 12px; overflow:hidden;">
+    <div class="p-3" style="border-bottom:1px solid rgba(255,255,255,0.07);">
+      <button onclick="newChat()" class="ai-new-chat-btn w-100">
+        <i class="fa-solid fa-plus me-2"></i>New Chat
+      </button>
+    </div>
+    <div class="overflow-auto flex-grow-1 p-2 custom-scrollbar">
+      <ul class="list-unstyled m-0" id="sessionList">
+        {% for session in sessions %}
+        <li class="session-item" id="session-{{ session.id }}"
+            onclick="loadSession({{ session.id }})">
+          <span class="text-truncate" style="max-width:85%;">{{ session.title }}</span>
+          <i class="fa-solid fa-trash session-delete"
+             onclick="event.stopPropagation(); deleteSession({{ session.id }})"></i>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <!-- Sidebar footer -->
+    <div class="p-3 text-center" style="border-top:1px solid rgba(255,255,255,0.06);">
+      <span style="font-size:0.65rem; color:#1e293b; text-transform:uppercase; letter-spacing:0.08em;">
+        by chadi0x · Unfiltered Mode
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Chat Main Area ─────────────────────────────────────────────────── -->
+  <div class="col-md-9 d-flex flex-column h-100"
+       style="background:#080d14; border:1px solid rgba(255,255,255,0.07); border-left:none; border-radius:0 12px 12px 0; overflow:hidden;">
+
+    <!-- Header -->
+    <div class="ai-chat-header">
+      <div class="d-flex align-items-center gap-3">
+        <div class="ai-avatar">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <div style="font-size:0.9rem; font-weight:800; color:#f1f5f9; letter-spacing:-0.02em;">
+            Psychopath AI
+          </div>
+          <div id="statusText" style="font-size:0.72rem; color:#64748b;">
+            Checking Ollama…
+          </div>
+        </div>
+      </div>
+      <div>
+        <select id="modelSelect" class="form-select form-select-sm"
+                style="width:160px; font-size:0.78rem;">
+          <option>Loading…</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Info banner -->
+    <div class="ai-info-banner">
+      <i class="fa-solid fa-circle-info me-2" style="color:#3b82f6;"></i>
+      Ensure <strong>Ollama</strong> is running on host port <code>11434</code>.
+      Recommended: <code>mistral:7b</code>, <code>llama3</code>, <code>llama2-uncensored</code>.
+    </div>
+
+    <!-- Messages -->
+    <div id="chatWindow" class="flex-grow-1 overflow-auto p-4 custom-scrollbar d-flex flex-column gap-3">
+      <div class="ai-welcome">
+        <i class="fa-solid fa-brain ai-welcome-icon"></i>
+        <p>Select a model and begin the session.</p>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="ai-input-area">
+      <form onsubmit="event.preventDefault(); sendMessage();" class="d-flex align-items-end gap-2">
+        <textarea id="userPrompt" class="ai-textarea" rows="2"
+                  placeholder="Enter instructions…"
+                  onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+        <button type="submit" id="sendBtn" class="ai-send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSessionId = null;
+
+  document.addEventListener('DOMContentLoaded', () => { fetchModels(); });
+
+  function fetchModels() {
+    fetch('/api/ai/models').then(r => r.json()).then(data => {
+      const sel = document.getElementById('modelSelect');
+      sel.innerHTML = '';
+      let models = data.models || [];
+      if (models.length > 0 && models[0].name) models = models.map(m => m.name);
+      if (!models.length) {
+        document.getElementById('statusText').innerHTML = '<span style="color:#dc2626;"><i class="fa-solid fa-circle-exclamation"></i> Ollama Offline</span>';
+        sel.innerHTML = '<option>Unreachable</option>';
+      } else {
+        document.getElementById('statusText').innerHTML = '<span style="color:#10b981;"><i class="fa-solid fa-circle"></i> Online</span>';
+        models.forEach(m => { const o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o); });
+      }
+    }).catch(() => {
+      document.getElementById('statusText').innerHTML = '<span style="color:#dc2626;">Error</span>';
+    });
+  }
+
+  function newChat() {
+    currentSessionId = null;
+    document.getElementById('chatWindow').innerHTML = `
+      <div class="ai-welcome">
+        <i class="fa-solid fa-brain ai-welcome-icon"></i>
+        <p>New session ready.</p>
+      </div>`;
+    document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+  }
+
+  function loadSession(id) {
+    currentSessionId = id;
+    document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('session-' + id);
+    if (el) el.classList.add('active');
+    document.getElementById('chatWindow').innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i></div>';
+    fetch('/api/ai/history/' + id).then(r => r.json()).then(data => {
+      document.getElementById('chatWindow').innerHTML = '';
+      data.messages.forEach(msg => appendMessage(msg.role, msg.content));
+      scrollToBottom();
+    });
+  }
+
+  function sendMessage() {
+    const promptInput = document.getElementById('userPrompt');
+    const prompt = promptInput.value.trim();
+    const model  = document.getElementById('modelSelect').value;
+    if (!prompt) return;
+    appendMessage('user', prompt);
+    promptInput.value = '';
+    scrollToBottom();
+    const loadingId = 'loading-' + Date.now();
+    document.getElementById('chatWindow').insertAdjacentHTML('beforeend', `
+      <div class="msg-row msg-ai" id="${loadingId}">
+        <div class="chat-bubble bubble-ai" style="color:#64748b;">
+          <i class="fa-solid fa-circle-notch fa-spin me-1"></i>Generating…
+        </div>
+      </div>`);
+    scrollToBottom();
+    fetch('/api/ai/chat', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ session_id:currentSessionId, prompt, model }) })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById(loadingId)?.remove();
+      if (data.status === 'success') {
+        appendMessage('assistant', data.response);
+        if (!currentSessionId) {
+          currentSessionId = data.session_id;
+          const list = document.getElementById('sessionList');
+          const li = document.createElement('li');
+          li.className = 'session-item active';
+          li.id = 'session-' + data.session_id;
+          li.onclick = () => loadSession(data.session_id);
+          li.innerHTML = `<span class="text-truncate" style="max-width:85%;">${data.session_title}</span>
+            <i class="fa-solid fa-trash session-delete" onclick="event.stopPropagation();deleteSession(${data.session_id})"></i>`;
+          list.prepend(li);
+        }
+        scrollToBottom();
+      } else appendError(data.message);
+    }).catch(e => { document.getElementById(loadingId)?.remove(); appendError('Network Error: ' + e); });
+  }
+
+  function appendMessage(role, text) {
+    const isUser = role === 'user';
+    let fmt = text.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/```([\s\S]*?)```/g,'<pre><code>$1</code></pre>')
+      .replace(/`([^`]+)`/g,'<code>$1</code>')
+      .replace(/\n/g,'<br>');
+    document.getElementById('chatWindow').insertAdjacentHTML('beforeend', `
+      <div class="msg-row ${isUser?'msg-user':'msg-ai'}">
+        <div class="chat-bubble ${isUser?'bubble-user':'bubble-ai'}">${fmt}</div>
+      </div>`);
+  }
+
+  function appendError(msg) {
+    document.getElementById('chatWindow').insertAdjacentHTML('beforeend', `
+      <div class="msg-row msg-ai">
+        <div class="chat-bubble bubble-ai" style="border-color:rgba(220,38,38,0.3);color:#dc2626;">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i>${msg}
+        </div>
+      </div>`);
+  }
+
+  function scrollToBottom() { const w = document.getElementById('chatWindow'); w.scrollTop = w.scrollHeight; }
+
+  function deleteSession(id) {
+    if (!confirm('Delete this chat?')) return;
+    fetch('/api/ai/session/' + id + '/delete', { method:'POST' })
+      .then(() => { document.getElementById('session-'+id)?.remove(); if (currentSessionId===id) newChat(); });
+  }
+</script>
+
+<style>
+/* Session sidebar */
+.session-item {
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.6rem 0.75rem; border-radius:7px; cursor:pointer;
+  font-size:0.8rem; color:#64748b; margin-bottom:2px;
+  transition:all 150ms ease-out;
+}
+.session-item:hover { background:rgba(255,255,255,0.04); color:#f1f5f9; }
+.session-item.active { background:rgba(220,38,38,0.08); color:#f1f5f9; border-left:2px solid #dc2626; }
+.session-delete { margin-left:auto; flex-shrink:0; opacity:0.3; color:#dc2626; font-size:0.72rem; transition:opacity 150ms; }
+.session-item:hover .session-delete { opacity:0.7; }
+
+.ai-new-chat-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.5rem; border-radius:7px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#94a3b8; font-size:0.82rem; font-weight:600;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.ai-new-chat-btn:hover { background:rgba(255,255,255,0.08); color:#f1f5f9; }
+
+/* Chat header */
+.ai-chat-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0.9rem 1.25rem;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  background:rgba(0,0,0,0.2);
+  flex-shrink:0;
+}
+
+.ai-avatar {
+  width:36px; height:36px;
+  background:rgba(220,38,38,0.1);
+  border:1px solid rgba(220,38,38,0.2);
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  color:#dc2626; font-size:0.85rem;
+}
+
+/* Info banner */
+.ai-info-banner {
+  padding:0.6rem 1.25rem;
+  background:rgba(59,130,246,0.05);
+  border-bottom:1px solid rgba(59,130,246,0.1);
+  font-size:0.75rem; color:#64748b; flex-shrink:0;
+}
+.ai-info-banner code { color:#10b981; background:rgba(16,185,129,0.1); padding:0 4px; border-radius:3px; }
+
+/* Welcome state */
+.ai-welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; color:#334155; gap:0.75rem; }
+.ai-welcome-icon { font-size:2.5rem; opacity:0.2; }
+.ai-welcome p { font-size:0.85rem; }
+
+/* Bubbles */
+.msg-row { display:flex; width:100%; }
+.msg-user { justify-content:flex-end; }
+.msg-ai   { justify-content:flex-start; }
+
+.chat-bubble {
+  max-width:80%; padding:10px 14px;
+  border-radius:12px; font-size:0.87rem; line-height:1.55;
+  white-space:pre-wrap;
+}
+.bubble-user {
+  background:#dc2626; color:#fff;
+  border-bottom-right-radius:3px;
+}
+.bubble-ai {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#e2e8f0;
+  border-bottom-left-radius:3px;
+}
+
+.bubble-ai code { background:rgba(0,0,0,0.35); padding:1px 5px; border-radius:3px; color:#10b981; font-size:0.85em; }
+.bubble-ai pre { background:#0a0f1a; padding:10px; border-radius:7px; overflow-x:auto; border:1px solid rgba(255,255,255,0.08); margin-top:6px; }
+.bubble-ai pre code { background:transparent; color:#10b981; padding:0; }
+
+/* Input area */
+.ai-input-area {
+  padding:1rem 1.25rem;
+  border-top:1px solid rgba(255,255,255,0.07);
+  background:rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+
+.ai-textarea {
+  flex:1; resize:none;
+  background:#0a0f1a !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  color:#f1f5f9 !important;
+  border-radius:8px !important;
+  padding:0.65rem 0.9rem !important;
+  font-family:'Outfit',sans-serif !important;
+  font-size:0.875rem !important;
+  transition:border-color 150ms !important;
+}
+.ai-textarea:focus { border-color:rgba(220,38,38,0.4) !important; outline:none !important; }
+.ai-textarea::placeholder { color:#334155; }
+
+.ai-send-btn {
+  width:38px; height:38px; flex-shrink:0;
+  background:#dc2626; border:1px solid #dc2626;
+  border-radius:8px; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.85rem; cursor:pointer;
+  transition:all 150ms ease-out;
+}
+.ai-send-btn:hover { background:#b91c1c; }
+</style>
+
+{% endblock %}

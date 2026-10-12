@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="chadi0x">
+    <meta name="developer" content="https://github.com/chadi0x">
+    <meta name="framework" content="Psychopath Console">
+    <title>Psychopath Console | by chadi0x</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter + Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modal_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='extensions.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap_overrides.css') }}">
+</head>
+
+<body>
+
+<!-- ── Layout Shell ─────────────────────────────────────────────────────────── -->
+<div id="wrapper">
+
+    <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+    <nav id="sidebar-wrapper">
+
+        <!-- Logo / Brand -->
+        <div class="sidebar-heading">
+            <span class="sidebar-logo-icon">
+                <i class="fa-solid fa-skull-crossbones"></i>
+            </span>
+            <span class="sidebar-logo-text">Psychopath</span>
+        </div>
+
+        <!-- Navigation -->
+        <div class="sidebar-nav">
+            <div class="sidebar-section-label">Recon</div>
+            <a href="{{ url_for('index') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'dashboard' else '' }}">
+                <i class="fa-solid fa-database"></i>
+                <span>Target Database</span>
+                {% if active_tab == 'dashboard' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('connections') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'connections' else '' }}">
+                <i class="fa-solid fa-circle-nodes"></i>
+                <span>Connections</span>
+                {% if active_tab == 'connections' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('osint') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'osint' else '' }}">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <span>Intelligence</span>
+                {% if active_tab == 'osint' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('osint_logs') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'analytics' else '' }}">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+                {% if active_tab == 'analytics' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+
+            <div class="sidebar-section-label mt-3">Operations</div>
+            <a href="{{ url_for('evil_dashboard') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'evil' else '' }}">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Evil Package</span>
+                {% if active_tab == 'evil' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('email_factory') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'email_factory' else '' }}">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                <span>Email Factory</span>
+                {% if active_tab == 'email_factory' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('smtp_knife') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'smtp_knife' else '' }}">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>SMTP Knife</span>
+                {% if active_tab == 'smtp_knife' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('smtp_credentials') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'smtp_credentials' else '' }}">
+                <i class="fa-solid fa-key"></i>
+                <span>SMTP Keys</span>
+                {% if active_tab == 'smtp_credentials' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+
+            <div class="sidebar-section-label mt-3">Tools</div>
+            <a href="{{ url_for('psychopath_ai') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'psychopath_ai' else '' }}">
+                <i class="fa-solid fa-microchip"></i>
+                <span>AI Companion</span>
+                {% if active_tab == 'psychopath_ai' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('flash_phishing') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'flash_phishing' else '' }}">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Flash Phishing</span>
+                {% if active_tab == 'flash_phishing' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+            <a href="{{ url_for('developer') }}"
+               class="sidebar-item {{ 'active' if active_tab == 'developer' else '' }}">
+                <i class="fa-brands fa-github"></i>
+                <span>Developer</span>
+                {% if active_tab == 'developer' %}<span class="sidebar-active-dot"></span>{% endif %}
+            </a>
+        </div>
+
+        <!-- Sidebar Footer: Add Target + Author -->
+        <div class="sidebar-footer">
+            <a href="{{ url_for('add_person') }}" class="sidebar-add-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Target</span>
+            </a>
+            <div class="sidebar-author">
+                <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-github"></i>
+                    <span>chadi0x</span>
+                </a>
+                <span class="sidebar-edu-badge">EDU</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Page Content ──────────────────────────────────────────────────────── -->
+    <main id="page-content-wrapper">
+
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <button id="menu-toggle" class="menu-toggle-btn" aria-label="Toggle sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <nav class="breadcrumb" aria-label="breadcrumb">
+                    <span class="breadcrumb-root">
+                        <i class="fa-solid fa-skull-crossbones text-danger me-1" style="font-size:0.7rem;"></i>
+                        Console
+                    </span>
+                    <i class="fa-solid fa-chevron-right breadcrumb-sep"></i>
+                    <span class="breadcrumb-current">{{ active_tab|replace('_',' ')|capitalize if active_tab else 'Dashboard' }}</span>
+                </nav>
+            </div>
+
+            <div class="navbar-right">
+                <!-- System status -->
+                <div class="status-indicator">
+                    <span class="status-dot pulse-live"></span>
+                    <span>Online</span>
+                </div>
+
+                <!-- Kill Switch -->
+                <button class="kill-btn" onclick="globalKillSwitch()" title="Emergency kill all flash links">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span class="d-none d-md-inline">Kill All</span>
+                </button>
+
+                <!-- Avatar -->
+                <div class="navbar-avatar" title="chadi0x">
+                    <i class="fa-solid fa-terminal"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Body -->
+        <div class="page-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert-banner alert-{{ category }}" role="alert">
+                        <i class="fa-solid fa-{{ 'circle-check' if category == 'success' else 'triangle-exclamation' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Protected Footer -->
+        <footer id="chadi0x-watermark" class="chadi0x-protected-footer">
+            <span class="footer-item">Psychopath Console v2.5</span>
+            <span class="footer-sep">·</span>
+            <span class="footer-item">
+                Architect:
+                <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer"
+                   id="chadi0x-author-link" class="footer-author">chadi0x</a>
+            </span>
+            <span class="footer-sep">·</span>
+            <a href="https://github.com/chadi0x" target="_blank" rel="noopener noreferrer" class="footer-github">
+                <i class="fa-brands fa-github me-1"></i>github.com/chadi0x
+            </a>
+            <span class="footer-sep">·</span>
+            <span class="footer-edu">Educational Use Only</span>
+        </footer>
+    </main>
+</div>
+
+<!-- ── Bootstrap JS ──────────────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script>
+    /* Sidebar toggle */
+    const wrapper     = document.getElementById('wrapper');
+    const menuToggle  = document.getElementById('menu-toggle');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => wrapper.classList.toggle('sidebar-collapsed'));
+    }
+
+    /* Global Kill Switch */
+    function globalKillSwitch() {
+        if (!confirm('⚠ EMERGENCY STOP\n\nThis will:\n• Deactivate ALL Flash Phishing links\n• Kill the Cloudflare Tunnel\n• Stop external access immediately\n\nProceed?')) return;
+
+        fetch('/api/flash/kill_all', { method: 'POST' })
+            .then(r => r.json())
+            .then(d => { alert('🛑 HALTED: ' + d.message); location.reload(); })
+            .catch(e => alert('Error: ' + e));
+    }
+</script>
+
+<style>
+/* ── Base Layout ────────────────────────────────────────────────────────────── */
+#wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────────── */
+#sidebar-wrapper {
+    width: 240px;
+    background: #0c1220;
+    border-right: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    transition: width 200ms ease-out, transform 200ms ease-out;
+    overflow: hidden;
+}
+
+/* Brand */
+.sidebar-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+}
+
+.sidebar-logo-icon {
+    width: 32px; height: 32px;
+    background: rgba(220,38,38,0.15);
+    border: 1px solid rgba(220,38,38,0.25);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #dc2626; font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+    font-size: 1rem; font-weight: 800;
+    color: #f1f5f9; letter-spacing: -0.03em;
+}
+
+/* Nav sections */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.75rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.sidebar-section-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #334155;
+    font-weight: 700;
+    padding: 0.5rem 0.5rem 0.25rem;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 7px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+    position: relative;
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-item i {
+    width: 16px; text-align: center;
+    font-size: 0.8rem; flex-shrink: 0;
+    transition: color 150ms ease-out;
+}
+
+.sidebar-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: #cbd5e1;
+    border-left-color: rgba(255,255,255,0.12);
+}
+
+.sidebar-item.active {
+    background: rgba(220,38,38,0.08);
+    color: #f1f5f9;
+    border-left-color: #dc2626;
+    font-weight: 600;
+}
+
+.sidebar-item.active i { color: #dc2626; }
+
+.sidebar-active-dot {
+    width: 4px; height: 4px;
+    background: #dc2626; border-radius: 50%;
+    margin-left: auto; flex-shrink: 0;
+}
+
+/* Footer */
+.sidebar-footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.sidebar-add-btn {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgba(220,38,38,0.25);
+    border-radius: 7px;
+    color: #dc2626; text-decoration: none;
+    font-size: 0.82rem; font-weight: 600;
+    background: rgba(220,38,38,0.06);
+    transition: all 150ms ease-out;
+    white-space: nowrap; overflow: hidden;
+}
+
+.sidebar-add-btn:hover {
+    background: rgba(220,38,38,0.12);
+    border-color: rgba(220,38,38,0.4);
+    color: #dc2626;
+}
+
+.sidebar-author {
+    display: flex; align-items: center;
+    gap: 0.5rem; padding: 0.35rem 0.5rem;
+    font-size: 0.75rem; color: #475569;
+}
+
+.sidebar-author a {
+    color: #475569; text-decoration: none;
+    display: flex; align-items: center; gap: 0.35rem;
+    transition: color 150ms;
+}
+
+.sidebar-author a:hover { color: #94a3b8; }
+
+.sidebar-edu-badge {
+    margin-left: auto;
+    font-size: 0.58rem; font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #334155; border: 1px solid #1e293b;
+    padding: 1px 5px; border-radius: 3px;
+    text-transform: uppercase;
+}
+
+/* ── Main Content ────────────────────────────────────────────────────────────── */
+#page-content-wrapper {
+    flex: 1;
+    margin-left: 240px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #080d14;
+    transition: margin-left 200ms ease-out;
+}
+
+.page-body {
+    flex: 1;
+    padding: 0 1.75rem 1.75rem;
+}
+
+/* ── Top Navbar ──────────────────────────────────────────────────────────────── */
+.top-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 1.75rem;
+    background: rgba(8,13,20,0.8);
+    backdrop-filter: blur(8px);
+    position: sticky; top: 0;
+    z-index: 100;
+}
+
+.navbar-left {
+    display: flex; align-items: center; gap: 0.75rem;
+}
+
+.menu-toggle-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: #64748b; width: 32px; height: 32px;
+    border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    transition: all 150ms ease-out;
+}
+.menu-toggle-btn:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+
+.breadcrumb {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.82rem; margin: 0; padding: 0;
+    background: none; border-radius: 0;
+}
+
+.breadcrumb-root { color: #475569; }
+.breadcrumb-sep  { color: #1e293b; font-size: 0.65rem; }
+.breadcrumb-current { color: #f1f5f9; font-weight: 600; }
+
+.navbar-right {
+    display: flex; align-items: center; gap: 0.75rem;
+}
+
+.status-indicator {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.75rem; color: #475569;
+}
+
+.status-dot {
+    width: 6px; height: 6px;
+    background: #10b981; border-radius: 50%;
+}
+
+.kill-btn {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: rgba(220,38,38,0.08);
+    border: 1px solid rgba(220,38,38,0.25);
+    color: #dc2626;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.78rem; font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease-out;
+    font-family: 'Outfit', sans-serif;
+}
+
+.kill-btn:hover {
+    background: rgba(220,38,38,0.15);
+    border-color: rgba(220,38,38,0.4);
+    box-shadow: 0 0 16px rgba(220,38,38,0.1);
+}
+
+.navbar-avatar {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    color: #475569; font-size: 0.75rem;
+}
+
+/* ── Flash alerts ────────────────────────────────────────────────────────────── */
+.alert-banner {
+    display: flex; align-items: center;
+    padding: 0.7rem 1rem;
+    border-radius: 8px; border: 1px solid;
+    font-size: 0.85rem; margin-bottom: 1rem;
+    position: relative;
+}
+
+.alert-success { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.25); color: #10b981; }
+.alert-danger, .alert-error { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.25); color: #dc2626; }
+.alert-warning { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); color: #f59e0b; }
+.alert-info { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.25); color: #3b82f6; }
+
+.alert-close {
+    background: none; border: none; color: inherit;
+    cursor: pointer; margin-left: auto; padding: 0 4px;
+    font-size: 0.85rem; opacity: 0.6;
+    transition: opacity 150ms;
+}
+.alert-close:hover { opacity: 1; }
+
+/* ── Footer ──────────────────────────────────────────────────────────────────── */
+.chadi0x-protected-footer {
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 0.6rem;
+    padding: 0.9rem 1.75rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.75rem; color: #334155;
+    backdrop-filter: blur(8px);
+    background: rgba(8,13,20,0.8);
+}
+
+.footer-sep { color: #1e293b; }
+.footer-author { color: #dc2626; text-decoration: none; font-weight: 600; }
+.footer-author:hover { color: #ef4444; }
+.footer-github { color: #475569; text-decoration: none; transition: color 150ms; }
+.footer-github:hover { color: #64748b; }
+.footer-edu {
+    font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #1e293b;
+    border: 1px solid #1e293b; padding: 1px 6px; border-radius: 3px;
+}
+
+/* ── Sidebar collapsed ───────────────────────────────────────────────────────── */
+#wrapper.sidebar-collapsed #sidebar-wrapper { width: 60px; }
+#wrapper.sidebar-collapsed #page-content-wrapper { margin-left: 60px; }
+#wrapper.sidebar-collapsed .sidebar-logo-text,
+#wrapper.sidebar-collapsed .sidebar-section-label,
+#wrapper.sidebar-collapsed .sidebar-item span,
+#wrapper.sidebar-collapsed .sidebar-active-dot,
+#wrapper.sidebar-collapsed .sidebar-add-btn span,
+#wrapper.sidebar-collapsed .sidebar-author span,
+#wrapper.sidebar-collapsed .sidebar-edu-badge { display: none; }
+#wrapper.sidebar-collapsed .sidebar-item { justify-content: center; padding: 0.65rem; }
+#wrapper.sidebar-collapsed .sidebar-item i { width: auto; }
+#wrapper.sidebar-collapsed .sidebar-add-btn { justify-content: center; }
+#wrapper.sidebar-collapsed .sidebar-heading { justify-content: center; padding: 1rem 0.75rem; }
+#wrapper.sidebar-collapsed .sidebar-author { justify-content: center; }
+
+/* ── Inputs / Forms baseline ──────────────────────────────────────────────────── */
+.form-control, .form-select {
+    background: #0a0f1a !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #f1f5f9 !important;
+    border-radius: 8px !important;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    transition: border-color 150ms, box-shadow 150ms;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: rgba(220,38,38,0.45) !important;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.08) !important;
+    outline: none;
+    background: #0d1323 !important;
+}
+
+.form-control::placeholder { color: #334155; }
+.form-label { color: #64748b; font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+
+/* ── Card baseline ────────────────────────────────────────────────────────────── */
+.card, .bg-glass {
+    background: rgba(255,255,255,0.025) !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4) !important;
+}
+
+.card-header {
+    background: rgba(0,0,0,0.2) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    padding: 0.85rem 1.25rem !important;
+}
+
+/* ── Buttons baseline ─────────────────────────────────────────────────────────── */
+.btn { border-radius: 7px !important; font-weight: 500 !important; font-family: 'Outfit', sans-serif; transition: all 150ms ease-out !important; font-size: 0.85rem !important; }
+
+.btn-primary { background: #dc2626 !important; border-color: #dc2626 !important; color: #fff !important; }
+.btn-primary:hover { background: #b91c1c !important; border-color: #b91c1c !important; box-shadow: 0 4px 14px rgba(220,38,38,0.25) !important; }
+
+.btn-outline-light { border-color: rgba(255,255,255,0.15) !important; color: #94a3b8 !important; background: transparent !important; }
+.btn-outline-light:hover { background: rgba(255,255,255,0.06) !important; color: #f1f5f9 !important; border-color: rgba(255,255,255,0.25) !important; }
+
+.btn-outline-danger { border-color: rgba(220,38,38,0.35) !important; color: #dc2626 !important; background: transparent !important; }
+.btn-outline-danger:hover { background: rgba(220,38,38,0.1) !important; }
+
+.btn-outline-primary { border-color: rgba(59,130,246,0.35) !important; color: #3b82f6 !important; background: transparent !important; }
+.btn-outline-primary:hover { background: rgba(59,130,246,0.1) !important; }
+
+.btn-danger { background: #dc2626 !important; border-color: #dc2626 !important; }
+.btn-danger:hover { background: #b91c1c !important; }
+
+.btn-sm { padding: 0.35rem 0.75rem !important; font-size: 0.78rem !important; }
+.btn-lg { padding: 0.65rem 1.4rem !important; font-size: 0.9rem !important; }
+
+/* ── Table baseline ───────────────────────────────────────────────────────────── */
+.table-dark { --bs-table-bg: transparent !important; --bs-table-hover-bg: rgba(255,255,255,0.025) !important; }
+.table > :not(caption) > * > * { background: transparent; border-bottom-color: rgba(255,255,255,0.05) !important; padding: 0.85rem 1rem; }
+.table thead > tr > th { color: #475569 !important; font-size: 0.7rem !important; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+
+/* ── Badge baseline ───────────────────────────────────────────────────────────── */
+.badge { font-weight: 500 !important; font-family: 'Outfit', sans-serif; letter-spacing: 0.02em; }
+.badge-tech { background: rgba(220,38,38,0.1); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+.text-accent { color: #dc2626 !important; }
+.text-muted  { color: #64748b !important; }
+
+/* ── Separator ────────────────────────────────────────────────────────────────── */
+hr { border-color: rgba(255,255,255,0.07) !important; }
+
+/* ── Typography ──────────────────────────────────────────────────────────────── */
+h1,h2,h3,h4,h5,h6 { color: #f1f5f9; letter-spacing: -0.025em; }
+h2 { font-size: 1.4rem; font-weight: 800; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+h4 { font-size: 1rem; font-weight: 700; }
+
+.font-monospace, code { font-family: 'Fira Code', 'Consolas', monospace !important; }
+
+/* ── Page Section Header ─────────────────────────────────────────────────────── */
+.page-section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.25rem; padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.page-section-header h2 { margin: 0; }
+
+/* ── Pulse animation for online dot ─────────────────────────────────────────── */
+@keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.8); }
+}
+.pulse-live { animation: pulse-dot 2.5s ease-in-out infinite; }
+</style>
+
+</body>
+</html>

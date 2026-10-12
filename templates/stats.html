@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="page-section-header">
+  <div>
+    <h2 class="mb-0">
+      <i class="fa-solid fa-chart-line text-danger me-2" style="font-size:0.95rem;"></i>
+      Tripwire Analytics
+    </h2>
+    <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+      Tracker ID: <code style="font-size:0.75rem; color:#dc2626;">{{ logger.id }}</code>
+      {% if person %}
+      &nbsp;·&nbsp; Linked to <strong style="color:#f1f5f9;">{{ person.name }}</strong>
+      {% endif %}
+    </p>
+  </div>
+  <a href="{{ url_for('osint_logs') }}" class="tbl-action-btn px-3 gap-2" style="width:auto;">
+    <i class="fa-solid fa-arrow-left"></i>
+    <span style="font-size:0.78rem;">All Trackers</span>
+  </a>
+</div>
+
+<!-- Capture Log Table -->
+<div class="osint-container">
+  <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle mb-0" style="table-layout:fixed;">
+      <thead>
+        <tr>
+          <th style="width:140px;">Timestamp</th>
+          <th style="width:160px;">IP Address</th>
+          <th style="width:180px;">Location</th>
+          <th style="width:160px;">ISP</th>
+          <th>Device (UA)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>
+            <span class="text-muted" style="font-size:0.78rem; font-family:'Fira Code',monospace;">
+              {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            </span>
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span id="ip-{{ log.id }}" style="font-family:'Fira Code',monospace; font-size:0.8rem; color:#dc2626; font-weight:600;">
+                {{ log.ip }}
+              </span>
+              <button class="tbl-action-btn" onclick="copyText('ip-{{ log.id }}')" title="Copy IP">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            {% if log.country %}
+            <div class="d-flex align-items-center gap-2">
+              <span id="loc-{{ log.id }}" class="badge-tech">
+                {{ log.country }}{% if log.city %}, {{ log.city }}{% endif %}
+              </span>
+              <button class="tbl-action-btn" onclick="copyText('loc-{{ log.id }}')" title="Copy Location">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+            {% else %}
+            <span class="text-muted" style="font-size:0.78rem;">Unknown</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span id="isp-{{ log.id }}" class="text-truncate"
+                    style="font-size:0.78rem; color:#94a3b8; max-width:120px;">
+                {{ log.isp or '—' }}
+              </span>
+              {% if log.isp %}
+              <button class="tbl-action-btn" onclick="copyText('isp-{{ log.id }}')" title="Copy ISP">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+              {% endif %}
+            </div>
+          </td>
+          <td>
+            <div class="d-flex align-items-start gap-2">
+              <span id="ua-{{ log.id }}" class="text-muted text-truncate"
+                    style="font-size:0.72rem; font-family:'Fira Code',monospace; flex:1;">
+                {{ log.user_agent }}
+              </span>
+              <button class="tbl-action-btn flex-shrink-0"
+                      onclick="copyText('ua-{{ log.id }}')" title="Copy UA">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5">
+            <div class="empty-state py-5">
+              <i class="fa-solid fa-satellite-dish"></i>
+              <p>Waiting for link activation — no hits yet.</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.tbl-action-btn {
+  width:26px; height:26px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:5px; color:#64748b;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:0.68rem; cursor:pointer; text-decoration:none;
+  transition:all 150ms; font-family:inherit;
+  flex-shrink:0;
+}
+.tbl-action-btn:hover { background:rgba(255,255,255,0.09); color:#f1f5f9; }
+</style>
+
+{% endblock %}

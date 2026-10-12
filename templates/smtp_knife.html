@@ -1,0 +1,233 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- ── Config Panel ──────────────────────────────────────────────────────── -->
+  <div class="col-md-5">
+    <div class="osint-container d-flex flex-column gap-4">
+      <div class="pf-section-label">
+        <i class="fa-solid fa-paper-plane me-1"></i>SMTP Knife
+      </div>
+      <p class="text-muted" style="font-size:0.78rem; margin:-1rem 0 0;">
+        Gmail relay tool using App Passwords. Bypasses standard login restrictions.
+      </p>
+
+      <!-- Credential panel -->
+      <div class="smtp-cred-panel">
+        <div class="smtp-cred-header">
+          <i class="fa-brands fa-google me-2 text-danger" style="font-size:0.85rem;"></i>
+          <span>Gmail Credentials</span>
+        </div>
+        <div class="smtp-cred-body">
+          <form id="smtpConfigForm" class="d-flex flex-column gap-3">
+            <div>
+              <label class="form-label">Gmail Address</label>
+              <input type="email" id="smtpEmail" class="form-control" placeholder="user@gmail.com">
+            </div>
+            <div>
+              <label class="form-label">App Password</label>
+              <div class="input-group">
+                <input type="password" id="smtpPass" class="form-control" placeholder="xxxx xxxx xxxx xxxx">
+                <button class="smtp-eye-btn" type="button" onclick="togglePassVisibility()">
+                  <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                </button>
+              </div>
+            </div>
+            <button type="button" id="connectBtn" onclick="testConnection()" class="flash-deploy-btn">
+              <i class="fa-solid fa-plug me-2"></i>Connect to Gmail SMTP
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Help accordion -->
+      <div class="smtp-help">
+        <button class="smtp-help-toggle" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseHelp">
+          <i class="fa-solid fa-circle-info me-2 text-muted" style="font-size:0.75rem;"></i>
+          <span>How to get App Password?</span>
+          <i class="fa-solid fa-chevron-down ms-auto text-muted" style="font-size:0.65rem;"></i>
+        </button>
+        <div id="collapseHelp" class="collapse">
+          <ol class="smtp-steps">
+            <li>Go to <a href="https://myaccount.google.com/security" target="_blank" class="text-danger">Google Account Security</a></li>
+            <li>Enable <strong>2-Step Verification</strong></li>
+            <li>Search for "App passwords" in the security settings</li>
+            <li>Create a new app password named <strong>"SMTP Knife"</strong></li>
+            <li>Copy the 16-character code and paste it above</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Payload Composer ──────────────────────────────────────────────────── -->
+  <div class="col-md-7">
+    <div class="osint-container h-100 d-flex flex-column"
+         id="composerContainer" style="opacity:0.3; pointer-events:none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="pf-section-label">Payload Composer</div>
+        <span id="statusBadge" class="hits-badge hits-waiting">
+          <span class="status-dot" style="background:#334155; width:5px; height:5px;"></span>
+          OFFLINE
+        </span>
+      </div>
+
+      <form id="payloadForm" class="d-flex flex-column gap-3 flex-grow-1">
+        <div>
+          <label class="form-label">Target Email</label>
+          <input type="email" id="targetEmail" class="form-control" placeholder="victim@example.com">
+        </div>
+        <div>
+          <label class="form-label">Subject Line</label>
+          <input type="text" id="emailSubject" class="form-control" placeholder="Urgent: Security Notification">
+        </div>
+        <div class="d-flex flex-column flex-grow-1">
+          <label class="form-label d-flex justify-content-between">
+            <span>Email Body <span class="text-muted fw-normal">(HTML Supported)</span></span>
+          </label>
+          <textarea id="emailBody" class="form-control flex-grow-1"
+                    style="min-height:160px; font-family:'Fira Code',monospace; font-size:0.78rem; color:#10b981; background:#0a0f1a; resize:vertical;"
+                    placeholder="<h1>Hello</h1><p>This is a test.</p>"></textarea>
+        </div>
+        <button type="button" onclick="sendEmail()" class="flash-deploy-btn" style="background:#10b981; border-color:#10b981;">
+          <i class="fa-solid fa-paper-plane me-2"></i>Launch Payload
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let verifiedEmail = null, verifiedPass = null;
+
+  function togglePassVisibility() {
+    const input = document.getElementById('smtpPass');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye','fa-eye-slash'); }
+    else { input.type = 'password'; icon.classList.replace('fa-eye-slash','fa-eye'); }
+  }
+
+  function testConnection() {
+    const email = document.getElementById('smtpEmail').value;
+    const pass  = document.getElementById('smtpPass').value;
+    const btn   = document.getElementById('connectBtn');
+    if (!email || !pass) { if(window.showToast) showToast('Enter credentials first!'); else alert('Enter credentials!'); return; }
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>Connecting…';
+    btn.disabled = true;
+
+    fetch('/api/smtp/test', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pass}) })
+      .then(r => r.json())
+      .then(data => {
+        btn.innerHTML = orig; btn.disabled = false;
+        if (data.status === 'success') {
+          const composer = document.getElementById('composerContainer');
+          composer.style.opacity = '1'; composer.style.pointerEvents = 'auto';
+          const badge = document.getElementById('statusBadge');
+          badge.className = 'hits-badge hits-active';
+          badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> CONNECTED';
+          document.getElementById('smtpEmail').disabled = true;
+          document.getElementById('smtpPass').disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Connected';
+          btn.style.background = '#10b981'; btn.style.borderColor = '#10b981';
+          btn.disabled = true;
+          verifiedEmail = email; verifiedPass = pass;
+          if(window.showToast) showToast('Connection successful! Blade unlocked.');
+        } else {
+          if(window.showToast) showToast('Error: ' + data.message); else alert(data.message);
+        }
+      })
+      .catch(e => { btn.innerHTML = orig; btn.disabled = false; alert('Network Error: ' + e); });
+  }
+
+  function sendEmail() {
+    if (!verifiedEmail) return;
+    const target  = document.getElementById('targetEmail').value;
+    const subject = document.getElementById('emailSubject').value;
+    const content = document.getElementById('emailBody').value;
+    if (!target || !subject || !content) { if(window.showToast) showToast('Fill all payload fields.'); return; }
+    const btn = document.querySelector('button[onclick="sendEmail()"]');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Sending…';
+    btn.disabled = true;
+    fetch('/api/smtp/send', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:verifiedEmail, password:verifiedPass, target, subject, content}) })
+      .then(r => r.json())
+      .then(data => {
+        btn.innerHTML = orig; btn.disabled = false;
+        if (data.status === 'success') { if(window.showToast) showToast('Payload delivered!'); else alert('Sent!'); }
+        else { if(window.showToast) showToast('Failed: ' + data.message); else alert('Failed: ' + data.message); }
+      })
+      .catch(e => { btn.innerHTML = orig; btn.disabled = false; alert('Send Error: ' + e); });
+  }
+</script>
+
+<style>
+.smtp-cred-panel {
+  border: 1px solid rgba(255,255,255,0.08); border-radius:10px; overflow:hidden;
+}
+.smtp-cred-header {
+  display:flex; align-items:center;
+  padding:0.65rem 1rem;
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  font-size:0.8rem; font-weight:700; color:#f1f5f9;
+  border-top:2px solid #dc2626;
+}
+.smtp-cred-body { padding:1.25rem; }
+
+.smtp-eye-btn {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+  color:#64748b; padding:0 0.75rem; cursor:pointer;
+  border-radius:0 7px 7px 0 !important;
+  transition:all 150ms;
+}
+.smtp-eye-btn:hover { background:rgba(255,255,255,0.1); color:#f1f5f9; }
+
+.smtp-help { border:1px solid rgba(255,255,255,0.07); border-radius:8px; overflow:hidden; }
+.smtp-help-toggle {
+  display:flex; align-items:center; width:100%;
+  padding:0.65rem 1rem;
+  background:rgba(255,255,255,0.03);
+  border:none; color:#64748b; font-size:0.8rem; cursor:pointer;
+  transition:all 150ms; font-family:'Outfit',sans-serif; gap:0.5rem;
+}
+.smtp-help-toggle:hover { background:rgba(255,255,255,0.06); color:#f1f5f9; }
+
+.smtp-steps {
+  list-style:none; padding:1rem; margin:0;
+  display:flex; flex-direction:column; gap:0.5rem;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.smtp-steps li { font-size:0.78rem; color:#64748b; padding-left:1rem; position:relative; }
+.smtp-steps li::before { content:counter(item) '. '; counter-increment:item; color:#dc2626; font-weight:600; position:absolute; left:0; }
+.smtp-steps { counter-reset:item; }
+.smtp-steps a { color:#dc2626; }
+
+.flash-deploy-btn {
+  display:flex; align-items:center; justify-content:center;
+  padding:0.6rem 1rem; border-radius:8px;
+  background:#dc2626; border:1px solid #dc2626;
+  color:#fff; font-weight:700; font-size:0.85rem;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:all 150ms ease-out;
+}
+.flash-deploy-btn:hover { filter:brightness(0.85); box-shadow:0 4px 14px rgba(220,38,38,0.25); }
+
+.hits-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:0.72rem; font-weight:600;
+  padding:3px 10px; border-radius:999px;
+}
+.hits-active { background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
+.hits-waiting { background:rgba(255,255,255,0.04); color:#475569; border:1px solid rgba(255,255,255,0.08); }
+
+.pf-section-label {
+  font-size:0.65rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:#334155;
+}
+</style>
+
+{% endblock %}

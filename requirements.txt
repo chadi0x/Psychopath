@@ -1,0 +1,7 @@
+flask
+flask-sqlalchemy
+googlesearch-python
+beautifulsoup4
+requests
+selenium
+webdriver-manager

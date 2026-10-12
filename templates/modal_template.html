@@ -1,0 +1,90 @@
+<!-- Sci-Fi Dossier Modal Structure -->
+<div id="personModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+
+        <div class="modal-header">
+            <div class="modal-img-wrapper">
+                <img id="modalImg" src="" alt="Profile">
+            </div>
+            <div class="modal-title-block">
+                <h2 id="modalName">Name</h2>
+                <div class="job-title" id="modalJob">Unknown Classification</div>
+
+                <div class="modal-badges">
+                    <span id="modalCountry" class="badge">
+                        <i class="fa-solid fa-earth-americas"></i> <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalCountry', true)"><i
+                                class="fa-regular fa-copy"></i></button>
+                    </span>
+                    <span id="modalIp" class="badge">
+                        <i class="fa-solid fa-network-wired"></i> <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalIp', true)"><i
+                                class="fa-regular fa-copy"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-grid">
+            <!-- Left Col: Data & Notes -->
+            <div class="modal-left-col">
+                <div id="modalNoteContainer" class="holo-note">
+                    <p id="modalNote">No logs available.</p>
+                    <button class="copy-btn-tech" onclick="copyText('modalNote')"
+                        style="position: absolute; bottom: 10px; right: 10px;"><i
+                            class="fa-regular fa-copy"></i></button>
+                </div>
+
+                <div class="section-title"><i class="fa-solid fa-cube"></i> Entity Data</div>
+
+                <div class="data-row">
+                    <span class="data-label">Email Protocol</span>
+                    <span class="data-val" id="modalEmail">
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalEmail', true)"><i
+                                class="fa-regular fa-copy"></i></button>
+                    </span>
+                </div>
+
+                <div class="data-row" id="modalLinkRow">
+                    <span class="data-label">Uplink (Socials)</span>
+                    <span class="data-val" id="modalLinks">
+                        <span></span>
+                        <button class="copy-btn-tech" onclick="copyText('modalLinks', true)"><i
+                                class="fa-regular fa-copy"></i></button>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right Col: Vault -->
+            <div class="modal-right-col">
+                <div class="section-title"><i class="fa-solid fa-lock"></i> Secure Vault</div>
+
+                <button class="btn-primary vault-btn" onclick="toggleVault()">
+                    <i class="fa-solid fa-fingerprint"></i> Decrypt
+                </button>
+
+                <div id="vaultContent" class="vault-content hidden">
+                    <div class="data-row locked-content">
+                        <span class="data-label">ID</span>
+                        <span class="data-val">
+                            <span id="modalSocialEmail" class="blur-text"></span>
+                            <button class="copy-btn-tech" onclick="copyText('modalSocialEmail')"><i
+                                    class="fa-regular fa-copy"></i></button>
+                        </span>
+                    </div>
+
+                    <div class="data-row locked-content">
+                        <span class="data-label">Key</span>
+                        <span class="data-val">
+                            <span id="modalSocialPass" class="blur-text"></span>
+                            <button class="copy-btn-tech" onclick="copyText('modalSocialPass')"><i
+                                    class="fa-regular fa-copy"></i></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,176 @@
+<!-- Developed by chadi0x (https://github.com/chadi0x) - Educational Purposes Only -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ── Toolbar ─────────────────────────────────────────────────────────────── -->
+<div class="glass-toolbar mb-3 justify-content-between">
+  <div class="d-flex align-items-center gap-2">
+    <span class="text-muted" style="font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em;">Map:</span>
+    <select id="mapSelector" class="glass-select" onchange="loadMap(this.value)">
+      <!-- Populated via JS -->
+    </select>
+    <button class="btn-icon-small" onclick="createNewMap()" title="New Map">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+    <span class="badge-tech ms-2 d-none d-md-inline-flex" style="gap:4px;">
+      <i class="fa-solid fa-circle-nodes" style="font-size:0.65rem;"></i>
+      chadi0x graph-engine
+    </span>
+  </div>
+
+  <div class="d-flex align-items-center gap-1">
+    <div class="toolbar-divider"></div>
+    <button class="btn-icon-small" onclick="network && network.addEdgeMode()" title="Add Edge">
+      <i class="fa-solid fa-draw-polygon"></i>
+    </button>
+    <button class="btn-icon-small" onclick="addStickyNote()" title="Add Note">
+      <i class="fa-solid fa-note-sticky"></i>
+    </button>
+    <button class="btn-icon-small" onclick="saveLayout()" title="Save Layout">
+      <i class="fa-solid fa-floppy-disk"></i>
+    </button>
+    <div class="toolbar-divider"></div>
+    <button class="btn-icon-small" onclick="setLayout('force')" title="Force Directed">
+      <i class="fa-solid fa-share-nodes"></i>
+    </button>
+    <button class="btn-icon-small" onclick="setLayout('hierarchical')" title="Hierarchical">
+      <i class="fa-solid fa-sitemap"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ── Canvas ──────────────────────────────────────────────────────────────── -->
+<div style="border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; height:74vh; background:rgba(0,0,0,0.2);">
+  <div id="mindmap" style="width:100%; height:100%;"></div>
+</div>
+
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script>
+  let network;
+  let nodes = new vis.DataSet([]);
+  let edges = new vis.DataSet([]);
+  let currentMapId = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initNetwork();
+    fetchMaps();
+  });
+
+  function initNetwork() {
+    const container = document.getElementById('mindmap');
+    const options = {
+      nodes: {
+        borderWidth: 1,
+        size: 28,
+        color: { border: 'rgba(220,38,38,0.4)', background: '#111827', highlight: { border: '#dc2626', background: '#1a2336' } },
+        font: { color: '#f1f5f9', face: 'Outfit', size: 13 },
+        shadow: { enabled: true, color: 'rgba(0,0,0,0.5)', x: 0, y: 4, size: 8 }
+      },
+      edges: {
+        width: 1.5,
+        color: { color: 'rgba(255,255,255,0.12)', highlight: '#dc2626', hover: 'rgba(220,38,38,0.5)' },
+        smooth: { type: 'continuous' },
+        arrows: 'to'
+      },
+      physics: {
+        stabilization: { iterations: 150 },
+        barnesHut: { gravitationalConstant: -8000, springConstant: 0.04, springLength: 95 }
+      },
+      manipulation: {
+        enabled: true,
+        addEdge: function(data, callback) {
+          if (data.from == data.to) return;
+          data.arrows = 'to';
+          callback(data);
+        }
+      },
+      interaction: { hover: true, tooltipDelay: 200 }
+    };
+    network = new vis.Network(container, { nodes, edges }, options);
+  }
+
+  function fetchMaps() {
+    fetch('/api/maps')
+      .then(r => r.json())
+      .then(data => {
+        const sel = document.getElementById('mapSelector');
+        sel.innerHTML = '';
+        data.maps.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id; opt.text = m.name;
+          sel.appendChild(opt);
+        });
+        if (data.maps.length > 0) loadMap(data.maps[0].id);
+        else createNewMap(true);
+      });
+  }
+
+  function createNewMap(isInit = false) {
+    const name = prompt('Map Name:', 'New Operation');
+    if (!name) return;
+    fetch('/api/maps', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    }).then(() => fetchMaps());
+  }
+
+  function loadMap(id) {
+    currentMapId = id;
+    fetch(`/api/maps/${id}`)
+      .then(r => r.json())
+      .then(data => {
+        nodes.clear(); edges.clear();
+        data.nodes.forEach(n => nodes.add({ id: n.id, label: n.label, shape: n.shape, image: n.image, x: n.x, y: n.y, fixed: n.fixed, color: n.color }));
+        data.edges.forEach(e => edges.add({ id: e.id, from: e.from, to: e.to, label: e.label, arrows: e.arrows }));
+        data.notes.forEach(note => nodes.add({
+          id: 'note_' + note.id, label: note.content, shape: 'box',
+          color: { background: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.4)' },
+          font: { color: '#fde68a', face: 'Fira Code' },
+          x: note.x, y: note.y, physics: false
+        }));
+        network.fit();
+      });
+  }
+
+  function saveLayout() {
+    if (!currentMapId) return;
+    const nodePositions = nodes.get().map(n => {
+      const pos = network.getPosition(n.id);
+      return { id: n.id, x: pos.x, y: pos.y, fixed: true };
+    });
+    fetch(`/api/maps/${currentMapId}/save_layout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nodes: nodePositions, edges: edges.get() })
+    }).then(() => { if (window.showToast) showToast('Layout saved!'); });
+  }
+
+  function addStickyNote() {
+    const content = prompt('Note Content:', '');
+    if (!content) return;
+    fetch(`/api/maps/${currentMapId}/notes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    }).then(r => r.json()).then(res => {
+      nodes.add({
+        id: 'note_' + res.id, label: content, shape: 'box',
+        color: { background: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.35)' },
+        font: { color: '#fde68a', face: 'Fira Code' },
+        physics: false
+      });
+    });
+  }
+
+  function setLayout(type) {
+    if (type === 'hierarchical') {
+      network.setOptions({ layout: { hierarchical: { enabled: true, direction: 'UD', sortMethod: 'hubsize' } } });
+    } else {
+      network.setOptions({ layout: { hierarchical: { enabled: false } } });
+    }
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="page-form-card">
+
+      <!-- Header -->
+      <div class="page-form-header">
+        <div>
+          <h2 class="mb-0">
+            <i class="fa-solid fa-{{ 'user-pen' if mode == 'edit' else 'user-plus' }} text-danger me-2" style="font-size:0.95rem;"></i>
+            {{ 'Edit Persona' if mode == 'edit' else 'New Target' }}
+          </h2>
+          <p class="text-muted mb-0 mt-1" style="font-size:0.78rem;">
+            {{ 'Update dossier entry' if mode == 'edit' else 'Register a new target in the database' }}
+          </p>
+        </div>
+        <a href="{{ url_for('index') }}" class="pf-close-btn">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
+
+      <!-- Form Body -->
+      <div class="page-form-body">
+        <form method="POST" class="pf-form">
+
+          <!-- Identity -->
+          <div class="pf-section-label">Identity</div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control"
+                     value="{{ person.name if person else '' }}"
+                     placeholder="John Smith" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Job / Role</label>
+              <input type="text" name="job" class="form-control"
+                     value="{{ person.job if person else '' }}"
+                     placeholder="Security Engineer">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Avatar URL <span class="pf-optional">(optional)</span></label>
+              <input type="url" name="image_url" class="form-control"
+                     value="{{ person.image_url if person else '' }}"
+                     placeholder="https://…/photo.jpg">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control"
+                     value="{{ person.email if person else '' }}"
+                     placeholder="target@domain.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Country</label>
+              <input type="text" name="country" class="form-control"
+                     value="{{ person.country if person else '' }}"
+                     placeholder="United States">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Social Links</label>
+              <input type="text" name="social_links" class="form-control"
+                     value="{{ person.social_links if person else '' }}"
+                     placeholder="linkedin.com/in/… · twitter.com/…">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Dossier Note</label>
+              <textarea name="note" class="form-control" rows="3"
+                        placeholder="Operational notes, context, associations…">{{ person.note if person else '' }}</textarea>
+            </div>
+          </div>
+
+          <!-- Vault Credentials -->
+          <div class="pf-divider">
+            <i class="fa-solid fa-lock me-2"></i>Vault Credentials
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Harvested Email / ID</label>
+              <input type="text" name="social_email" class="form-control"
+                     value="{{ person.social_email if person else '' }}"
+                     placeholder="victim@email.com">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Harvested Password</label>
+              <input type="text" name="social_password" class="form-control"
+                     value="{{ person.social_password if person else '' }}"
+                     placeholder="p4ssw0rd">
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pf-actions">
+            <a href="{{ url_for('index') }}" class="pf-btn-cancel">Cancel</a>
+            <button type="submit" class="pf-btn-submit">
+              <i class="fa-solid fa-floppy-disk me-2"></i>
+              {{ 'Update Target' if mode == 'edit' else 'Save Target' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-form-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  margin-top: 0.5rem;
+}
+
+.page-form-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.5rem 1.75rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.2);
+}
+
+.pf-close-btn {
+  width: 30px; height: 30px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 7px; color: #64748b;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-size: 0.9rem;
+  transition: all 150ms ease-out;
+}
+.pf-close-btn:hover { background: rgba(255,255,255,0.1); color: #f1f5f9; }
+
+.page-form-body { padding: 1.75rem; }
+
+.pf-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.pf-section-label {
+  font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.1em; color: #334155; margin-bottom: -0.5rem;
+}
+
+.pf-optional { font-size: 0.7rem; color: #334155; font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.pf-divider {
+  display: flex; align-items: center;
+  font-size: 0.78rem; font-weight: 700; color: #dc2626;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(220,38,38,0.15);
+  margin-top: 0.5rem;
+}
+
+.pf-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.pf-btn-cancel {
+  display: inline-flex; align-items: center;
+  padding: 0.55rem 1.2rem; border-radius: 7px;
+  font-size: 0.85rem; font-weight: 500;
+  color: #64748b; text-decoration: none;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 150ms ease-out;
+}
+.pf-btn-cancel:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+
+.pf-btn-submit {
+  display: inline-flex; align-items: center;
+  padding: 0.55rem 1.4rem; border-radius: 7px;
+  font-size: 0.85rem; font-weight: 700;
+  color: #fff; background: #dc2626;
+  border: 1px solid #dc2626; cursor: pointer;
+  transition: all 150ms ease-out; font-family: 'Outfit', sans-serif;
+}
+.pf-btn-submit:hover { background: #b91c1c; box-shadow: 0 4px 16px rgba(220,38,38,0.25); }
+</style>
+{% endblock %}

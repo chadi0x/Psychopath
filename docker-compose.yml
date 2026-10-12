@@ -1,0 +1,14 @@
+# ==============================================================================
+# Psychopath Console - Docker Compose Orchestration
+# Architect: chadi0x (https://github.com/chadi0x)
+# Educational & Security Research Use Only
+# ==============================================================================
+
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./instance:/app/instance
+    restart: always
