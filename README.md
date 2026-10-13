@@ -36,15 +36,15 @@
 
 | 🛰️ OSINT Intelligence & Image Recon | ⚡ Flash Phishing Multi-Platform Portal |
 | :---: | :---: |
-| <img width="1352" height="635" alt="intelgence" src="https://github.com/user-attachments/assets/e7ddeff6-d20d-4a52-bb6f-16d88875bb1b" />  <br> *30+ Turnkey Cloned Portals with Tunneling* | 
+| ![OSINT Screenshot](https://github.com/user-attachments/assets/e7ddeff6-d20d-4a52-bb6f-16d88875bb1b) <br> *Automated Footprinting & Headless Scraper* | ![Flash Phishing Screenshot](https://github.com/user-attachments/assets/0bfb1302-6842-4f56-83b8-33088261cc24) <br> *30+ Turnkey Cloned Portals with Tunneling* |
 
 | 📦 Evil Package Factory & Lures | 🔪 SMTP Knife & Credential Vault |
 | :---: | :---: |
-| ![Evil Package Screenshot](docs/screenshots/evil_dashboard.png) <br> *Multi-OS Lure Landing Page Generator* | ![SMTP Knife Screenshot](docs/screenshots/smtp_knife.png) <br> *Direct Relay Delivery & Verification* |
+| ![Evil Package Screenshot](https://github.com/user-attachments/assets/67004608-ce63-4d9e-b239-2c26a18a0cea) <br> *Multi-OS Lure Landing Page Generator* | ![SMTP Knife Screenshot](https://github.com/user-attachments/assets/7fba6d0c-1b3f-4148-aa59-89e7fa018b56) <br> *Direct Relay Delivery & Verification* |
 
 | 🤖 Psychopath AI Social Engineering | 📊 Live Harvest & Analytics Feed |
 | :---: | :---: |
-| ![AI Chat Screenshot](docs/screenshots/ai_chat.png) <br> *Pretexting & Scenario Brainstorming* | ![Analytics Screenshot](docs/screenshots/analytics.png) <br> *Real-time IP Tracker & Geolocation Map* |
+| ![AI Chat Screenshot](https://github.com/user-attachments/assets/3d7241dd-4965-4936-9de5-0f44d398a182) <br> *Pretexting & Scenario Brainstorming* | ![Analytics Screenshot](https://github.com/user-attachments/assets/66e46838-748c-4272-b956-60852ea51b66) <br> *Real-time IP Tracker & Geolocation Map* |
 
 ---
 
