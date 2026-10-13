@@ -296,6 +296,17 @@ docker-compose up -d
 * **Contributions & Support:** Found a bug or have an educational feature suggestion? Feel free to open an Issue or Pull Request on the [GitHub Repository](https://github.com/chadi0x).
 
 ---
+## 💎 Premium Edition & Custom Feature Requests
+
+Looking for an enterprise-ready version, custom module development, or have a specific feature request you want brought to life? 
+
+For specialized builds, tailored implementations, or custom red-team tool development:
+
+📩 **Direct Telegram:** [@HISOKA0MOROW](https://t.me/HISOKA0MOROW)
+
+> ⚠️ **Notice:** This project and all custom implementations are developed strictly for authorized security research, educational purposes, and legal red-team assessments.
+
+---
 
 <p align="center">
   <sub>Developed with 💻 and ☕ by <a href="https://github.com/chadi0x"><strong>chadi0x</strong></a>. Strictly for authorized educational & security research use.</sub>
